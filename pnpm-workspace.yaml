@@ -1,0 +1,6 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "packages/plugins/*"
+allowBuilds:
+  protobufjs: true
