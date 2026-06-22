@@ -1,23 +1,26 @@
 {
-  "name": "@infera/inference-engine",
-  "version": "0.1.0",
+  "name": "Infera",
+  "version": "1.0.0",
   "description": "",
-  "private": true,
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "index.js",
+  "packageManager": "pnpm@11.8.0",
   "scripts": {
-    "build": "tsc",
-    "test": "echo \"no test configured yet\""
+    "test": "pnpm exec turbo run test",
+    "lint": "pnpm exec turbo run lint",
+    "build": "pnpm exec turbo run build",
+    "dev": "pnpm exec turbo run dev"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
-  "dependencies": {
-    "onnxruntime-web": "^1.27.0",
-    "@infera/core": "workspace:*"
-  },
   "devDependencies": {
-    "typescript": "^5.5.0"
+    "turbo": "^2.9.18",
+    "eslint": "^10.5.0",
+    "prettier": "^3.8.4",
+    "eslint-config-prettier": "^10.1.8",
+    "@typescript-eslint/parser": "^8.61.1",
+    "@typescript-eslint/eslint-plugin": "^8.61.1",
+    "vitest": "^4.1.9"
   }
 }
