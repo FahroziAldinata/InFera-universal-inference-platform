@@ -1,23 +1,23 @@
 {
-  "name": "Infera",
-  "version": "1.0.0",
+  "name": "@infera/inference-engine",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "echo \"no test configured yet\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.8.0",
-      "onFail": "download"
-    }
-  },
   "type": "module",
+  "dependencies": {
+    "onnxruntime-web": "^1.27.0",
+    "@infera/core": "workspace:*"
+  },
   "devDependencies": {
-    "turbo": "^2.9.18"
+    "typescript": "^5.5.0"
   }
 }
