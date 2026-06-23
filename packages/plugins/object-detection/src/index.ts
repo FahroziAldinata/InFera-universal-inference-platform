@@ -31,4 +31,15 @@ export type { NMSOptions } from './postprocess/nms';
 
 // Utils
 export { drawDetections } from './utils/canvas';
-export { getColorForClass, CLASS_COLORS } from './utils/colors';
+
+// Visualization
+export type { DrawOptions, DrawStatistics } from './visualization/types';
+export { getColorForClass, DEFAULT_CLASS_COLORS as CLASS_COLORS } from './visualization/colors';
+export { drawBoundingBox, drawCenterPoint } from './visualization/draw_boxes';
+export { drawBoundingBoxLabel } from './visualization/draw_labels';
+export {
+    exportCanvasToBlob,
+    exportCanvasToPNG,
+    exportCanvasToJPEG,
+    exportCanvasToDataURL,
+} from './visualization/export_canvas';

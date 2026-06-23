@@ -239,22 +239,21 @@ Commit: `344572f`
 - [x] Tambahkan unit test di `draw_boxes.test.ts` untuk memverifikasi text baseline, background width/height, dan top boundary clamping
 - [x] Verifikasi build, typecheck, dan test sukses (128 tests pass)
 
-### Tahap 5.5 — Canvas Rendering Engine
-- [ ] Implementasikan `drawDetections` returning `DrawStatistics`
-- [ ] Verifikasi build & tests sukses
+### Tahap 5.5 — Canvas Rendering Engine ✅
+- [x] Implementasikan `drawDetections` di `src/utils/canvas.ts` returning `DrawStatistics` (totalDetections, renderTimeMs)
 
-### Tahap 5.6 — Support Retina Display
-- [ ] Dynamic device pixel ratio scaling
-- [ ] Verifikasi build & tests sukses
+### Tahap 5.6 — Support Retina Display ✅
+- [x] Menambahkan dukungan auto-scaling berbasis `devicePixelRatio` dan backup canvas drawing untuk ImageData
 
 ### Tahap 5.7 — Export Helper ✅
 - [x] Implementasikan `src/visualization/export_canvas.ts` dengan dukungan PNG, JPEG, dan DataURL
 - [x] Tambahkan unit test `export_canvas.test.ts` untuk verifikasi format ekspor dan fallback error jika tidak didukung
 - [x] Verifikasi build, typecheck, dan test sukses (142 tests pass)
 
-### Tahap 5.8 — Integration
-- [ ] Integrasikan & export all modules
-- [ ] Verifikasi build & tests sukses
+### Tahap 5.8 — Integration ✅
+- [x] Export seluruh module baru di `src/index.ts`
+- [x] Tambahkan unit test `draw_detections.test.ts` untuk memverifikasi integration rendering, Retina display, dan ImageData background drawing
+- [x] Verifikasi build, typecheck, dan test sukses (**152 tests pass, 34 test files**)
 
 ---
 
