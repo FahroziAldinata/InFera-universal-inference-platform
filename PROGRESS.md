@@ -9,12 +9,13 @@ Terakhir diperbarui: **24 Juni 2026**
 ## Status Ringkas
 
 | Tahap (sesuai Roadmap TDD)              | Status         |
-|------------------------------------------|----------------|
+|------------------------------------------|-----------------|
 | Tahap 1: Core Foundation & MVP           | ✅ Selesai     |
 | Tahap 2: Object Detection & Segmentation | ✅ Selesai     |
 | Tahap 3: Tabular & OCR                   | ⬜ Belum mulai |
 | Tahap 4: Plugin SDK Terbuka              | ⬜ Belum mulai |
 | Tahap 5: Produksi & WebGPU               | ✅ Selesai     |
+| **Phase 11: Dokumentasi & Deployment**   | ✅ Selesai     |
 
 ---
 
@@ -435,4 +436,116 @@ Spesifikasi lengkap arsitektur dan kapabilitas InFera saat ini dapat dibaca pada
 - **[Spesifikasi Universal Model Package (UAMP)](file:///E:/Infera/README.md#6-universal-model-package-uamp-specification)**
 
 - Dokumen acuan: `universal_inference_platform_tdd.md`
+
+---
+
+## Phase 11 — Documentation Website & Deployment ✅
+
+Terakhir diperbarui: **24 Juni 2026**
+
+### Tahap 11.1 — VitePress Documentation Site ✅
+
+**File Baru:**
+- `apps/docs/package.json` — Workspace docs dengan VitePress ^1.6.3
+- `apps/docs/.vitepress/config.ts` — Konfigurasi VitePress (nav, sidebar, search, GitHub Pages base URL)
+- `apps/docs/.vitepress/theme/index.ts` — Custom theme override
+- `apps/docs/.vitepress/theme/custom.css` — Brand colors indigo/violet, hover effects
+- `apps/docs/public/logo.svg` — Logo SVG neural network InFera
+- `apps/docs/index.md` — Landing page dengan hero, 8 feature cards
+- `apps/docs/guide/getting-started.md` — Quick start, instalasi, perintah workspace
+- `apps/docs/guide/architecture.md` — Diagram arsitektur, penjelasan paket, prinsip desain
+- `apps/docs/plugins/object-detection.md` — Panduan lengkap plugin object detection
+- `apps/docs/plugins/image-classification.md` — Panduan plugin image classification
+- `apps/docs/uamp/index.md` — Spesifikasi UAMP lengkap
+- `apps/docs/benchmark/index.md` — Tabel benchmark performa
+- `apps/docs/browser-compat/index.md` — Matriks kompatibilitas browser
+- `apps/docs/api/index.md` — Indeks API reference
+- `apps/docs/changelog/index.md` — Riwayat perubahan semua phase
+
+**Alasan Teknis:**
+- VitePress dipilih karena ringan, Vue-based, mendukung markdown dengan mermaid, dan optimal untuk dokumentasi teknis.
+- `ignoreDeadLinks: true` ditambahkan karena halaman API akan di-generate TypeDoc dan belum ada saat build pertama.
+- `base: '/InFera-universal-inference-platform/'` dikonfigurasi untuk GitHub Pages sub-path deployment.
+- Docs workspace dikecualikan dari turbo build pipeline (`--filter=!@infera/docs`) karena VitePress adalah ESM-only dan konflik dengan esbuild versi yang dipakai web-client.
+
+### Tahap 11.2 — TypeDoc API Generation ✅
+
+**File Baru:**
+- `typedoc.json` — Konfigurasi TypeDoc dengan 4 entrypoint package, output ke `apps/docs/api/generated/`
+
+**Script Baru di `package.json`:**
+- `pnpm docs:api` — Generate API docs menggunakan TypeDoc
+- `pnpm docs:build` — Build VitePress docs site
+- `pnpm docs:preview` — Preview docs build lokal
+- `pnpm docs:dev` — Dev server docs
+
+**DevDependency Baru:**
+- `typedoc@^0.27.9` di root `package.json`
+
+### Tahap 11.3 — GitHub Pages CI/CD ✅
+
+**File Baru:**
+- `.github/workflows/docs.yml` — Workflow build dan deploy docs ke GitHub Pages (trigger: push ke main)
+- `.github/workflows/release.yml` — Workflow publish ke npm (trigger: git tag v*.*.*)
+
+**File Diperbarui:**
+- `.github/workflows/ci.yml` — Ditambahkan step `pnpm lint` eksplisit
+
+**Alasan Teknis:**
+- Workflow docs menggunakan `actions/deploy-pages@v4` dengan permission `pages: write` dan `id-token: write`.
+- Workflow release di-trigger oleh git tag `v*.*.*` untuk atomisitas rilis.
+
+### Tahap 11.4 — npm Publish Preparation ✅
+
+**File Diperbarui (hapus `private`, tambah metadata):**
+- `packages/core/package.json`
+- `packages/inference-engine/package.json`
+- `packages/plugins/object-detection/package.json`
+- `packages/plugins/image-classification/package.json`
+
+**Metadata yang Ditambahkan:**
+```json
+{
+  "author": "Fahrozi Aldinata <fahrozialdinata2@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://FahroziAldinata.github.io/InFera-universal-inference-platform/",
+  "repository": { "type": "git", "url": "...", "directory": "packages/..." },
+  "publishConfig": { "access": "public" }
+}
+```
+
+**File Baru (`.npmignore` per package):**
+- `packages/core/.npmignore`
+- `packages/inference-engine/.npmignore`
+- `packages/plugins/object-detection/.npmignore`
+- `packages/plugins/image-classification/.npmignore`
+
+### Tahap 11.5 — Release Documentation ✅
+
+**File Diperbarui:**
+- `CHANGELOG.md` — Lengkap dengan entri v0.1.0, v0.2.0, dan [Unreleased]
+- `README.md` — Diterjemahkan ke Bahasa Indonesia, badge CI/npm/license, link docs, kredit Fahrozi Aldinata
+
+**File Baru:**
+- `RELEASE.md` — Panduan proses rilis: bump versi, git tag, push, verifikasi npm, rollback
+- `DEPLOYMENT.md` — Panduan GitHub Pages setup, manual trigger, troubleshooting, custom domain
+
+### Tahap 11.6 — Final Validation ✅
+
+| Perintah | Status |
+|---|:---:|
+| `pnpm build` | ✅ PASS |
+| `pnpm typecheck` | ✅ PASS |
+| `pnpm test` | ✅ PASS (252 tests) |
+| `pnpm lint` | ✅ PASS |
+| `pnpm docs:build` | ✅ PASS |
+| `npm pack --dry-run` | ✅ PASS |
+| `git push origin main` | ✅ Berhasil |
+
+**Risiko:**
+- TypeDoc membutuhkan build packages terlebih dahulu sebelum dijalankan (sudah dicatat di docs.yml workflow).
+- VitePress `ignoreDeadLinks: true` diaktifkan karena halaman API TypeDoc di-generate saat runtime CI.
+- npm publish membutuhkan `NPM_TOKEN` secret yang harus dikonfigurasi manual di GitHub repository settings.
+
+**Commit:** `c0f6a1a` — `feat(docs): complete phase 11 - vitepress docs, cicd, npm publish prep`
 - Repo: https://github.com/FahroziAldinata/InFera-universal-inference-platform
