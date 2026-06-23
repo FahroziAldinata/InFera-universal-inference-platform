@@ -10,6 +10,7 @@ export interface DrawOptions {
     fillOpacity?: number;
     lineDash?: number[];
     labelPosition?: 'top' | 'inside' | 'bottom';
+    showBoxes?: boolean;
 }
 
 export interface DrawStatistics {

@@ -17,7 +17,7 @@ export async function fileToImageData(
         if (!input.complete) {
             await new Promise<void>((resolve, reject) => {
                 input.onload = () => resolve();
-                input.onerror = (err) => reject(new Error('Failed to load image element'));
+                input.onerror = () => reject(new Error('Failed to load image element'));
             });
         }
         bitmap = await createImageBitmap(input);

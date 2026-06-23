@@ -101,7 +101,8 @@ export function drawDetections(
         cornerRadius = 0,
         fillOpacity = 0,
         lineDash = [],
-        labelPosition = 'top'
+        labelPosition = 'top',
+        showBoxes = true
     } = options;
 
     // 5. Draw overlays for each detection
@@ -110,13 +111,15 @@ export function drawDetections(
         const boxColor = det.color || getColorForClass(det.classId, classColors);
 
         // Draw bounding box outline (and fill)
-        drawBoundingBox(ctx, x, y, width, height, boxColor, {
-            lineWidth,
-            lineDash,
-            cornerRadius,
-            fillOpacity,
-            opacity
-        });
+        if (showBoxes) {
+            drawBoundingBox(ctx, x, y, width, height, boxColor, {
+                lineWidth,
+                lineDash,
+                cornerRadius,
+                fillOpacity,
+                opacity
+            });
+        }
 
         // Draw center point dot if requested
         if (showCenterPoint) {

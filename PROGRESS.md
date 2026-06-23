@@ -316,20 +316,40 @@ Commit: `344572f`
 
 ---
 
-## 13. Next Steps
+## 13. Object Detection Phase 8 (Web Client Integration) ✅
+
+### Tahap 8.1 — State & Hook Lifecycle ✅
+- [x] Implementasikan `detectionStore.ts` menggunakan Zustand untuk melacak status deteksi, preferensi overlay visual, benchmarking, zoom/pan, dan penyorotan baris.
+- [x] Implementasikan React Hook `useObjectDetection.ts` untuk memfasilitasi load model (Weights ONNX + Label) dan loader UAMP ZIP (.zip) secara dinamis.
+
+### Tahap 8.2 — Canvas Overlay & Result Grid ✅
+- [x] Buat `DetectionCanvas.tsx` yang menggambar image background dan bounding box overlay menggunakan canvas API dengan DPI/Retina scaling.
+- [x] Buat `DetectionResultTable.tsx` yang menampilkan daftar deteksi objek, koordinat, level confidence, dan aksi salin ke clipboard.
+
+### Tahap 8.3 — Toolbar & Benchmarks ✅
+- [x] Buat `DetectionToolbar.tsx` untuk toggle box, labels, confidences, reset viewport, dan memfasilitasi ekspor visualisasi (JPEG/PNG).
+- [x] Buat `MetricsPanel.tsx` untuk menampilkan latencies, FPS, memori heap, dan riwayat perbandingan performa.
+
+### Tahap 8.4 — Page Layout Integration ✅
+- [x] Gabungkan komponen di `ObjectDetectionPage.tsx` dan integrasikan tab switcher pada `App.tsx`.
+- [x] Verifikasi build & typecheck sukses (226 tests pass)
+
+---
+
+## 14. Next Steps
 
 Urutan logis berikutnya:
 
-1. **Object Detection Plugin (Phase 3 & 4)**:
-   - Integrasi ONNX Runtime untuk inference
-   - Non-Maximum Suppression (NMS) & IoU postprocessing
-2. **Object Detection Plugin (Phase 5, 6, & 7)**:
-   - Visualisasi bounding box dengan canvas overlay
-   - custom labels (.txt / .json) & universal model package (.zip)
-3. **Stabilization**:
+1. **Interactive UI Improvements (Phase 9)**:
+   - UI controls untuk zoom, pan, toggle visibility, dan selection.
+2. **Batch Inference (Phase 10)**:
+   - Antrian inferensi untuk pemrosesan banyak gambar secara serial/paralel di browser.
+3. **Universal Inference SDK (Phase 12)**:
+   - Abstraksi menjadi SDK modular untuk framework frontend lainnya.
+4. **Stabilization**:
    - Fix `@infera/core` alias di `packages/inference-engine` — hapus workaround relative import
    - Unit test pertama (Vitest) — `validateModelFile()` dan `PluginManager` di `packages/core`
-4. **IndexedDB (Dexie.js)** — histori inferensi di `web-client/src/db/`
+5. **IndexedDB (Dexie.js)** — histori inferensi di `web-client/src/db/`
 
 
 ---

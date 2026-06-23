@@ -642,3 +642,698 @@ body {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.7);
 }
+
+/* ============================================================
+   Object Detection Workspace Styles (Phase 8 & 9)
+   ============================================================ */
+
+/* ── Tab Switcher ────────────────────────────────────────── */
+.tab-switcher {
+  display: flex;
+  margin-left: auto;
+  gap: 4px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--tx-2);
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.12s;
+}
+
+.tab-btn:hover {
+  background: var(--surface-1);
+  color: var(--tx-1);
+}
+
+.tab-btn--active {
+  background: var(--surface-2) !important;
+  color: var(--accent) !important;
+  border-bottom: 2px solid var(--accent);
+}
+
+/* ── Workspace Page Layout ───────────────────────────────── */
+.canvas-view-area {
+  flex: 1;
+  background: var(--main-bg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+.visualizer-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-1);
+  overflow: hidden;
+}
+
+.visualizer-title {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--tx-3);
+  text-transform: uppercase;
+}
+
+/* ── Canvas Viewport / Zoom & Pan ────────────────────────── */
+.canvas-container {
+  flex: 1;
+  position: relative;
+  background: #09090c;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-transform-wrapper {
+  position: relative;
+  display: inline-block;
+  user-select: none;
+  touch-action: none;
+  transition: transform 0.05s ease-out;
+}
+
+.canvas-overlay {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.canvas-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tx-3);
+  font-style: italic;
+}
+
+/* ── Canvas HUD controls ─────────────────────────────────── */
+.canvas-hud {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  background: rgba(19, 19, 26, 0.85);
+  border: 1px solid var(--border-bright);
+  padding: 4px 8px;
+  border-radius: 20px;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+.hud-btn {
+  background: transparent;
+  border: none;
+  color: var(--tx-2);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.1s;
+}
+
+.hud-btn:hover {
+  background: var(--surface-2);
+  color: #fff;
+}
+
+.hud-info {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--tx-2);
+  padding-right: 6px;
+}
+
+/* ── Error Banner ────────────────────────────────────────── */
+.error-banner {
+  background: var(--red-dim);
+  border-left: 3px solid var(--red);
+  padding: 10px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+.error-icon {
+  color: var(--red);
+  font-weight: bold;
+}
+
+.error-text {
+  color: var(--tx-1);
+  font-size: 12px;
+}
+
+/* ── Upload Mode Tabs ────────────────────────────────────── */
+.upload-mode-selector {
+  display: flex;
+  margin: 10px 8px 12px;
+  background: var(--surface-1);
+  padding: 2px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.mode-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--tx-3);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.1s;
+}
+
+.mode-tab-btn.active {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+
+.upload-field-container {
+  padding: 0 8px;
+}
+
+.setting-field {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  gap: 4px;
+}
+
+.setting-label {
+  font-size: 10px;
+  color: var(--tx-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.select-input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--tx-1);
+  padding: 5px;
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--tx-2);
+  cursor: pointer;
+}
+
+.manual-uploader-grid {
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 10px;
+  color: var(--tx-3);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.upload-btn--small {
+  border: 1px dashed var(--border-bright);
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  margin: 10px 8px 0;
+  border-radius: 3px;
+  background: var(--green-dim);
+  border-left: 2px solid var(--green);
+}
+
+.status-indicator.success {
+  background: var(--green-dim);
+  border-left-color: var(--green);
+}
+
+.indicator-icon {
+  color: var(--green);
+  font-weight: bold;
+}
+
+.indicator-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.indicator-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.indicator-text {
+  font-size: 11px;
+  color: var(--tx-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reset-btn {
+  background: transparent;
+  border: none;
+  color: var(--red);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.image-picker-btn {
+  border: 1px dashed var(--border-bright);
+  text-align: center;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+/* ── Bounding Box Toggles Toolbar ────────────────────────── */
+.toggles-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 8px;
+  gap: 6px;
+}
+
+.toolbar-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--tx-2);
+  cursor: pointer;
+}
+
+.toolbar-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
+.view-controls-row {
+  padding: 4px 8px;
+}
+
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--tx-2);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  font-size: 11px;
+  border-radius: 3px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: all 0.1s;
+}
+
+.btn-secondary:hover {
+  background: var(--hover);
+  color: #fff;
+  border-color: var(--border-bright);
+}
+
+.export-controls-row {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px;
+  gap: 6px;
+}
+
+.export-label {
+  font-size: 10px;
+  color: var(--tx-3);
+  text-transform: uppercase;
+}
+
+.export-btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.btn-export {
+  padding: 5px;
+}
+
+/* ── Result Detections Table ─────────────────────────────── */
+.result-table-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.result-table-header {
+  padding: 6px 16px;
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.result-count {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--tx-3);
+  text-transform: uppercase;
+}
+
+.result-table-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.result-table-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+
+.result-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-bright);
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.result-table th {
+  background: #101016;
+  color: var(--tx-3);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 9px;
+  padding: 6px 12px;
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.result-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table-row {
+  transition: background 0.08s;
+  cursor: pointer;
+}
+
+.table-row:hover {
+  background: var(--hover);
+}
+
+.table-row--highlighted {
+  background: rgba(36, 136, 255, 0.1) !important;
+}
+
+.row-index {
+  color: var(--tx-3);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.row-color-badge {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.row-label {
+  color: var(--tx-1);
+  font-weight: 600;
+}
+
+.row-conf {
+  color: var(--accent);
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.row-box {
+  color: var(--tx-2);
+  font-size: 11px;
+}
+
+.table-action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  opacity: 0.6;
+  transition: opacity 0.1s;
+}
+
+.table-action-btn:hover {
+  opacity: 1;
+}
+
+/* ── Benchmarks & Metrics Panel ──────────────────────────── */
+.metrics-panel {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.metrics-header {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--tx-3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.metric-card {
+  background: #111116;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 9px;
+  color: var(--tx-3);
+  text-transform: uppercase;
+}
+
+.metric-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tx-1);
+  margin-top: 2px;
+}
+
+.metric-value.highlight {
+  color: var(--accent);
+}
+
+.metric-value.backend-webgpu {
+  color: var(--green);
+}
+
+.metric-value.backend-wasm {
+  color: var(--yellow);
+}
+
+.section-label {
+  font-size: 9px;
+  color: var(--tx-3);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.latency-breakdown-bar {
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--border-bright);
+  display: flex;
+  margin-bottom: 6px;
+}
+
+.breakdown-segment {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.breakdown-preprocess {
+  background: #9b51e0; /* purple */
+}
+
+.breakdown-inference {
+  background: var(--accent); /* blue */
+}
+
+.breakdown-postprocess {
+  background: var(--green); /* green */
+}
+
+.latency-legend {
+  display: flex;
+  gap: 12px;
+  font-size: 10px;
+  color: var(--tx-2);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.prep-dot { background: #9b51e0; }
+.inf-dot { background: var(--accent); }
+.post-dot { background: var(--green); }
+
+/* ── Metrics History Comparison ──────────────────────────── */
+.metrics-history-section {
+  margin-top: 14px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--red);
+  font-size: 9px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.history-list-container {
+  max-height: 110px;
+  overflow-y: auto;
+}
+
+.history-list-container::-webkit-scrollbar {
+  width: 2px;
+}
+
+.history-list-container::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+.history-list {
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.history-time {
+  color: var(--tx-3);
+}
+
+.history-backend.backend-webgpu { color: var(--green); }
+.history-backend.backend-wasm { color: var(--yellow); }
+
+.history-total {
+  color: var(--tx-1);
+  font-weight: bold;
+}
+
+.history-fps {
+  color: var(--tx-2);
+}
+
+.placeholder-text {
+  color: var(--tx-3);
+  font-size: 11px;
+  font-style: italic;
+  padding: 12px;
+  text-align: center;
+}

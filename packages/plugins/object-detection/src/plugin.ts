@@ -12,7 +12,7 @@ import { runInference } from './runtime/inference';
 import { decodeYOLO } from './postprocess/decoder';
 import { restoreBoxes } from './postprocess/restore_boxes';
 import { nonMaxSuppression } from './postprocess/nms';
-import { calculateMetrics, type InferenceMetrics } from './runtime/benchmark';
+import { calculateMetrics } from './runtime/benchmark';
 import type { RuntimeBackend } from './runtime/capability';
 
 export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {

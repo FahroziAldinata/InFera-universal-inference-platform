@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { ModelUploader } from './components/ModelUploader';
 import { ImageUploader } from './components/ImageUploader';
 import { RunButton } from './components/RunButton';
 import { useInferenceStore } from './store/inferenceStore';
+import { ObjectDetectionPage } from './features/object-detection/pages/ObjectDetectionPage';
 import './App.css';
 
 function StatusBar() {
@@ -139,28 +141,49 @@ function RightPanel() {
 }
 
 function App() {
+  const [activeTab, setActiveTab] = useState<'classification' | 'detection'>('classification');
+
   return (
     <div className="workstation">
       <div className="titlebar">
         <span className="titlebar-title">INFERA</span>
         <span className="titlebar-divider" />
         <span className="titlebar-subtitle">Universal Inference Platform</span>
+        
+        <div className="tab-switcher">
+          <button 
+            className={`tab-btn ${activeTab === 'classification' ? 'tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('classification')}
+          >
+            Classification
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'detection' ? 'tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('detection')}
+          >
+            Object Detection (WebGPU)
+          </button>
+        </div>
       </div>
 
-      <div className="workspace">
-        <aside className="sidebar">
-          <div className="section-header">MODEL</div>
-          <ModelUploader />
-          <div className="sidebar-divider" />
-          <div className="section-header">INPUT</div>
-          <ImageUploader />
-          <RunButton />
-        </aside>
+      {activeTab === 'classification' ? (
+        <div className="workspace">
+          <aside className="sidebar">
+            <div className="section-header">MODEL</div>
+            <ModelUploader />
+            <div className="sidebar-divider" />
+            <div className="section-header">INPUT</div>
+            <ImageUploader />
+            <RunButton />
+          </aside>
 
-        <RightPanel />
-      </div>
+          <RightPanel />
+        </div>
+      ) : (
+        <ObjectDetectionPage />
+      )}
 
-      <StatusBar />
+      {activeTab === 'classification' && <StatusBar />}
     </div>
   );
 }

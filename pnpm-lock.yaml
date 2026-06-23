@@ -237,6 +237,9 @@ importers:
       '@infera/plugin-image-classification':
         specifier: workspace:*
         version: link:../../packages/plugins/image-classification
+      '@infera/plugin-object-detection':
+        specifier: workspace:*
+        version: link:../../packages/plugins/object-detection
       dexie:
         specifier: ^4.4.4
         version: 4.4.4

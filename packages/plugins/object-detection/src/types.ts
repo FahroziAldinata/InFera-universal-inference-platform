@@ -1,4 +1,4 @@
-import type { InputType, ModelFormat, Tensor } from '@infera/core';
+import type { Tensor } from '@infera/core';
 
 export interface BoundingBox {
     x: number;      // x coordinate (top-left or normalized depending on use-case, typically normalized [0, 1])

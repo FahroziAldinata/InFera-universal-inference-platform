@@ -7,7 +7,7 @@ export function drawBoundingBoxLabel(
     text: string,
     x: number,
     y: number,
-    w: number,
+    _w: number,
     h: number,
     color: string,
     options: {
