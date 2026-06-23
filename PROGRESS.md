@@ -385,6 +385,14 @@ Urutan logis berikutnya:
 
 ---
 
-## Referensi
+## Referensi & Spesifikasi Platform
+Spesifikasi lengkap arsitektur dan kapabilitas InFera saat ini dapat dibaca pada file utama berikut:
+- **[Diagram Arsitektur](file:///E:/Infera/README.md#1-architecture-diagram)**
+- **[Matriks Fitur (Image Classification vs Object Detection)](file:///E:/Infera/README.md#2-feature-matrix)**
+- **[Matriks Browser Compatibility](file:///E:/Infera/README.md#3-browser-compatibility-matrix)**
+- **[Matriks Dukungan WebGPU](file:///E:/Infera/README.md#4-webgpu-support-table)**
+- **[Tabel Performance Benchmark](file:///E:/Infera/README.md#5-performance-benchmark-table)**
+- **[Spesifikasi Universal Model Package (UAMP)](file:///E:/Infera/README.md#6-universal-model-package-uamp-specification)**
+
 - Dokumen acuan: `universal_inference_platform_tdd.md`
 - Repo: https://github.com/FahroziAldinata/InFera-universal-inference-platform
