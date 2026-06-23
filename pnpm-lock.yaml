@@ -231,6 +231,12 @@ importers:
 
   apps/web-client:
     dependencies:
+      '@infera/inference-engine':
+        specifier: workspace:*
+        version: link:../../packages/inference-engine
+      '@infera/plugin-image-classification':
+        specifier: workspace:*
+        version: link:../../packages/plugins/image-classification
       dexie:
         specifier: ^4.4.4
         version: 4.4.4
@@ -304,6 +310,16 @@ importers:
       onnxruntime-web:
         specifier: ^1.27.0
         version: 1.27.0
+    devDependencies:
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  packages/plugins/image-classification:
+    dependencies:
+      '@infera/core':
+        specifier: workspace:*
+        version: link:../../core
     devDependencies:
       typescript:
         specifier: ^5.5.0
