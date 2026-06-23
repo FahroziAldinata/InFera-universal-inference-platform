@@ -43,3 +43,12 @@ export {
     exportCanvasToJPEG,
     exportCanvasToDataURL,
 } from './visualization/export_canvas';
+
+// Model Package (UAMP Specifications)
+export { loadPackage } from './model-package/package_loader';
+export type {
+    SupportedTask,
+    PackageMetadata,
+    ParsedModelPackage,
+    PackageValidationResult
+} from './model-package/types';

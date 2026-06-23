@@ -281,9 +281,10 @@ Commit: `344572f`
 - [x] Validasi Zip Slip (path traversal check), Zip Bomb (100MB limit check), dan Max Entries (1000 file limit check) terintegrasi langsung pada `unzipArchive()`
 - [x] Verifikasi build & tests sukses
 
-### Tahap 6.8 — Future Compatibility
-- [ ] Tambahkan task enums & support visualizer exports
-- [ ] Verifikasi build & tests sukses
+### Tahap 6.8 — Future Compatibility ✅
+- [x] Export `loadPackage` dan type UAMP di `src/index.ts`
+- [x] Tambahkan unit test `package_loader.test.ts` (14 test cases) mencakup model loading valid, labels format text/json/map, fallback labels, nested/corrupt zip, zip slip protection, zip bomb limits, dan non-UTF8 validation
+- [x] Verifikasi build, typecheck, dan test sukses (**180 tests pass, 36 test files**)
 
 ---
 
