@@ -247,9 +247,10 @@ Commit: `344572f`
 - [ ] Dynamic device pixel ratio scaling
 - [ ] Verifikasi build & tests sukses
 
-### Tahap 5.7 — Export Helper
-- [ ] Implementasikan `src/visualization/export_canvas.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 5.7 — Export Helper ✅
+- [x] Implementasikan `src/visualization/export_canvas.ts` dengan dukungan PNG, JPEG, dan DataURL
+- [x] Tambahkan unit test `export_canvas.test.ts` untuk verifikasi format ekspor dan fallback error jika tidak didukung
+- [x] Verifikasi build, typecheck, dan test sukses (142 tests pass)
 
 ### Tahap 5.8 — Integration
 - [ ] Integrasikan & export all modules
