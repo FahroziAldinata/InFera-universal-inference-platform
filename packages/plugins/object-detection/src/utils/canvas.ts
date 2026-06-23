@@ -102,22 +102,79 @@ export function drawDetections(
         fillOpacity = 0,
         lineDash = [],
         labelPosition = 'top',
-        showBoxes = true
+        showBoxes = true,
+        hoveredDetectionId = null,
+        selectedDetectionId = null,
+        lineDashOffset = 0,
+        showCrosshair = false,
     } = options;
+
+    const hasActiveHighlight = hoveredDetectionId !== null || selectedDetectionId !== null;
 
     // 5. Draw overlays for each detection
     for (const det of detections) {
         const { x, y, width, height } = det;
         const boxColor = det.color || getColorForClass(det.classId, classColors);
 
+        const isSelected = selectedDetectionId !== null && det.id === selectedDetectionId;
+        const isHovered = hoveredDetectionId !== null && det.id === hoveredDetectionId;
+
+        // Dim non-highlighted items if there is an active selection/hover
+        let currentOpacity = opacity;
+        if (hasActiveHighlight && !isSelected && !isHovered) {
+            currentOpacity = opacity * 0.35;
+        }
+
+        let currentLineWidth = lineWidth;
+        let currentLineDash = lineDash;
+        let currentLineDashOffset = lineDashOffset;
+        let currentFillOpacity = fillOpacity;
+
+        if (isSelected) {
+            currentLineWidth = lineWidth + 2;
+            currentLineDash = [6, 4];
+            currentLineDashOffset = lineDashOffset;
+            currentFillOpacity = Math.max(fillOpacity, 0.15);
+        } else if (isHovered) {
+            currentLineWidth = lineWidth + 1;
+            currentFillOpacity = Math.max(fillOpacity, 0.1);
+        }
+
+        // Draw crosshair guide lines if hovered or selected
+        if (showCrosshair && (isHovered || isSelected)) {
+            ctx.save();
+            ctx.strokeStyle = boxColor;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.globalAlpha = currentOpacity * 0.5;
+            
+            const centerX = x + width / 2;
+            const centerY = y + height / 2;
+            
+            // Horizontal line
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(targetWidth, centerY);
+            ctx.stroke();
+            
+            // Vertical line
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, targetHeight);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
         // Draw bounding box outline (and fill)
         if (showBoxes) {
             drawBoundingBox(ctx, x, y, width, height, boxColor, {
-                lineWidth,
-                lineDash,
+                lineWidth: currentLineWidth,
+                lineDash: currentLineDash,
+                lineDashOffset: currentLineDashOffset,
                 cornerRadius,
-                fillOpacity,
-                opacity
+                fillOpacity: currentFillOpacity,
+                opacity: currentOpacity,
             });
         }
 
@@ -125,7 +182,7 @@ export function drawDetections(
         if (showCenterPoint) {
             const centerX = x + width / 2;
             const centerY = y + height / 2;
-            drawCenterPoint(ctx, centerX, centerY, boxColor, Math.max(3, lineWidth));
+            drawCenterPoint(ctx, centerX, centerY, boxColor, Math.max(3, currentLineWidth));
         }
 
         // Draw label box and text if requested
@@ -137,7 +194,7 @@ export function drawDetections(
             drawBoundingBoxLabel(ctx, labelText, x, y, width, height, boxColor, {
                 fontSize,
                 labelPosition,
-                opacity
+                opacity: currentOpacity,
             });
         }
     }

@@ -11,6 +11,10 @@ export interface DrawOptions {
     lineDash?: number[];
     labelPosition?: 'top' | 'inside' | 'bottom';
     showBoxes?: boolean;
+    hoveredDetectionId?: string | null;
+    selectedDetectionId?: string | null;
+    lineDashOffset?: number;
+    showCrosshair?: boolean;
 }
 
 export interface DrawStatistics {

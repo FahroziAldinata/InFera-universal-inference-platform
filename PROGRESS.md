@@ -334,23 +334,34 @@ Commit: `344572f`
 - [x] Gabungkan komponen di `ObjectDetectionPage.tsx` dan integrasikan tab switcher pada `App.tsx`.
 - [x] Verifikasi build & typecheck sukses (226 tests pass)
 
+## 14. Object Detection Phase 9 (Interactive Bounding Boxes UI) ✅
+
+- [x] **Stable IDs (Rec. 1 & 10)**: Generasikan unique stable string IDs (`id: string`) untuk setiap deteksi dalam postprocess model dan lacak state `hoveredDetectionId`, `selectedDetectionId`, dan `selectedDetectionIds` (untuk multi-selection) di Zustand store.
+- [x] **Spatial Overlap Priority (Rec. 2)**: Implementasikan geometry engine `findDetectionAtPoint()` untuk memprioritaskan matching berdasarkan (1) Smallest Area, (2) Highest Confidence, dan (3) Nearest Center.
+- [x] **DOM Ref Tooltip (Rec. 3)**: Gunakan custom DOM-ref tooltip rendering untuk update style position (`translate3d`) dan text content secara langsung tanpa memicu React re-render lag (berjalan lancar di 60 FPS).
+- [x] **rAF Canvas Selection Loop (Rec. 4)**: Jalankan render loop canvas visualizer menggunakan `requestAnimationFrame` untuk animasikan selection outline dashed border offset yang super smooth.
+- [x] **Coordinate Transform Utility (Rec. 5)**: Buat helper `transform.ts` yang menangani konversi dua arah antara: screen to canvas, canvas to screen, image to canvas, dan canvas to image.
+- [x] **Pure Renderer Canvas (Rec. 6)**: Pisahkan state pan, zoom, selection ke Zustand, jadikan `DetectionCanvas` pure renderer visualizer yang reaktif terhadap perubahan state.
+- [x] **Zoom Constraints (Rec. 7)**: Tingkatkan batas zoom range viewport menjadi `0.1x` hingga `20x` untuk support object berukuran mikroskopi/satelit.
+- [x] **Double Click Focus (Rec. 8)**: Implementasikan aksi `focusDetection()` pada event double-click pada bounding box canvas atau table row untuk meletakkan viewport tepat di tengah target box dengan zoom 2x.
+- [x] **Keyboard Accessibility (Rec. 9)**: Tambahkan pintasan keyboard navigasi: Home, End, PageUp, PageDown, ArrowUp/ArrowDown, Enter (select), dan Escape (clear selection).
+- [x] **Additional Verification & Stress Tests**: Tambahkan unit test untuk hit testing 1,000 overlapping boxes (<1ms), stress rendering 500 boxes, adaptasi devicePixelRatio 1, 2, 3, dan zoom constraints 0.1x hingga 20x.
+- [x] **Verification**: `pnpm build && pnpm typecheck && pnpm test` lulus sempurna (250 tests pass) ✅
+
 ---
 
-## 14. Next Steps
+## 15. Next Steps
 
 Urutan logis berikutnya:
 
-1. **Interactive UI Improvements (Phase 9)**:
-   - UI controls untuk zoom, pan, toggle visibility, dan selection.
-2. **Batch Inference (Phase 10)**:
+1. **Batch Inference (Phase 10)**:
    - Antrian inferensi untuk pemrosesan banyak gambar secara serial/paralel di browser.
-3. **Universal Inference SDK (Phase 12)**:
+2. **Universal Inference SDK (Phase 12)**:
    - Abstraksi menjadi SDK modular untuk framework frontend lainnya.
-4. **Stabilization**:
+3. **Stabilization**:
    - Fix `@infera/core` alias di `packages/inference-engine` — hapus workaround relative import
    - Unit test pertama (Vitest) — `validateModelFile()` dan `PluginManager` di `packages/core`
-5. **IndexedDB (Dexie.js)** — histori inferensi di `web-client/src/db/`
-
+4. **IndexedDB (Dexie.js)** — histori inferensi di `web-client/src/db/`
 
 ---
 

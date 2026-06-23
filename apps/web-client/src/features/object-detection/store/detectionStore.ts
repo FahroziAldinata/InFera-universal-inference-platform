@@ -26,10 +26,14 @@ export interface DetectionState {
     showLabels: boolean;
     showBoxes: boolean;
     showConfidence: boolean;
+    showCrosshair: boolean;
+    showTooltip: boolean;
     zoom: number;
     panX: number;
     panY: number;
-    activeDetectionIndex: number | null;
+    hoveredDetectionId: string | null;
+    selectedDetectionId: string | null;
+    selectedDetectionIds: string[];
 
     // Actions
     setStep: (step: DetectionStep) => void;
@@ -42,9 +46,14 @@ export interface DetectionState {
     setShowLabels: (show: boolean) => void;
     setShowBoxes: (show: boolean) => void;
     setShowConfidence: (show: boolean) => void;
+    setShowCrosshair: (show: boolean) => void;
+    setShowTooltip: (show: boolean) => void;
     setZoom: (zoom: number) => void;
     setPan: (x: number, y: number) => void;
-    setActiveDetectionIndex: (index: number | null) => void;
+    setHoveredDetectionId: (id: string | null) => void;
+    setSelectedDetectionId: (id: string | null) => void;
+    setSelectedDetectionIds: (ids: string[]) => void;
+    focusDetection: (id: string, viewportWidth: number, viewportHeight: number) => void;
     reset: () => void;
 }
 
@@ -63,13 +72,17 @@ const initialState = {
     showLabels: true,
     showBoxes: true,
     showConfidence: true,
+    showCrosshair: false,
+    showTooltip: true,
     zoom: 1,
     panX: 0,
     panY: 0,
-    activeDetectionIndex: null,
+    hoveredDetectionId: null,
+    selectedDetectionId: null,
+    selectedDetectionIds: [],
 };
 
-export const useDetectionStore = create<DetectionState>((set) => ({
+export const useDetectionStore = create<DetectionState>((set, get) => ({
     ...initialState,
 
     setStep: (step) => set({ step }),
@@ -98,7 +111,9 @@ export const useDetectionStore = create<DetectionState>((set) => ({
             zoom: 1,
             panX: 0,
             panY: 0,
-            activeDetectionIndex: null,
+            hoveredDetectionId: null,
+            selectedDetectionId: null,
+            selectedDetectionIds: [],
         }),
 
     setDetections: (detections, metrics) =>
@@ -120,9 +135,34 @@ export const useDetectionStore = create<DetectionState>((set) => ({
     setShowLabels: (show) => set({ showLabels: show }),
     setShowBoxes: (show) => set({ showBoxes: show }),
     setShowConfidence: (show) => set({ showConfidence: show }),
-    setZoom: (zoom) => set({ zoom }),
+    setShowCrosshair: (show) => set({ showCrosshair: show }),
+    setShowTooltip: (show) => set({ showTooltip: show }),
+    setZoom: (zoom) => set({ zoom: Math.max(0.1, Math.min(zoom, 20)) }),
     setPan: (x, y) => set({ panX: x, panY: y }),
-    setActiveDetectionIndex: (index) => set({ activeDetectionIndex: index }),
+    setHoveredDetectionId: (id) => set({ hoveredDetectionId: id }),
+    setSelectedDetectionId: (id) => set({ selectedDetectionId: id }),
+    setSelectedDetectionIds: (ids) => set({ selectedDetectionIds: ids }),
+    focusDetection: (id, viewportWidth, viewportHeight) => {
+        const state = get();
+        const det = state.detections.find((d) => d.id === id);
+        if (!det) return;
+
+        // Double click sets absolute zoom to 2.0x
+        const targetZoom = 2; 
+        const centerX = det.x + det.width / 2;
+        const centerY = det.y + det.height / 2;
+
+        // Align target center to viewport center
+        const targetPanX = viewportWidth / 2 - centerX * targetZoom;
+        const targetPanY = viewportHeight / 2 - centerY * targetZoom;
+
+        set({
+            selectedDetectionId: id,
+            zoom: targetZoom,
+            panX: targetPanX,
+            panY: targetPanY,
+        });
+    },
 
     reset: () => set(initialState),
 }));

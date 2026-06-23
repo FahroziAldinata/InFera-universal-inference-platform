@@ -1,15 +1,42 @@
+import { useEffect, useRef } from 'react';
 import { useDetectionStore } from '../store/detectionStore';
 
 export function DetectionResultTable() {
-    const { detections, activeDetectionIndex, setActiveDetectionIndex } = useDetectionStore();
+    const {
+        detections,
+        hoveredDetectionId,
+        selectedDetectionId,
+        setHoveredDetectionId,
+        setSelectedDetectionId,
+        focusDetection,
+    } = useDetectionStore();
 
-    function copyToClipboard(index: number) {
-        const det = detections[index];
+    const selectedRowRef = useRef<HTMLTableRowElement>(null);
+
+    // Automatically scroll to the selected row when selected via canvas or keyboard
+    useEffect(() => {
+        if (selectedDetectionId && selectedRowRef.current) {
+            selectedRowRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            });
+        }
+    }, [selectedDetectionId]);
+
+    function copyToClipboard(id: string) {
+        const det = detections.find((d) => d.id === id);
         if (!det) return;
         const text = `Class: ${det.className}\nConfidence: ${(det.confidence * 100).toFixed(2)}%\nBox: x=${det.x.toFixed(1)}, y=${det.y.toFixed(1)}, w=${det.width.toFixed(1)}, h=${det.height.toFixed(1)}`;
         navigator.clipboard.writeText(text);
-        alert(`Detections info copied to clipboard!`);
+        alert(`Detection detail copied to clipboard!`);
     }
+
+    const handleRowDoubleClick = (id: string) => {
+        const container = document.querySelector('.canvas-container');
+        const viewportWidth = container?.clientWidth || 640;
+        const viewportHeight = container?.clientHeight || 480;
+        focusDetection(id, viewportWidth, viewportHeight);
+    };
 
     if (detections.length === 0) {
         return (
@@ -37,13 +64,20 @@ export function DetectionResultTable() {
                     </thead>
                     <tbody>
                         {detections.map((det, idx) => {
-                            const isHighlighted = idx === activeDetectionIndex;
+                            const isSelected = det.id === selectedDetectionId;
+                            const isHovered = det.id === hoveredDetectionId;
+                            const isHighlighted = isSelected || isHovered;
+
                             return (
                                 <tr
-                                    key={idx}
-                                    className={`table-row ${isHighlighted ? 'table-row--highlighted' : ''}`}
-                                    onMouseEnter={() => setActiveDetectionIndex(idx)}
-                                    onMouseLeave={() => setActiveDetectionIndex(null)}
+                                    key={det.id || idx}
+                                    ref={isSelected ? selectedRowRef : undefined}
+                                    className={`table-row ${isHighlighted ? 'table-row--highlighted' : ''} ${isHovered ? 'table-row--hovered' : ''}`}
+                                    onMouseEnter={() => setHoveredDetectionId(det.id || null)}
+                                    onMouseLeave={() => setHoveredDetectionId(null)}
+                                    onClick={() => setSelectedDetectionId(det.id || null)}
+                                    onDoubleClick={() => det.id && handleRowDoubleClick(det.id)}
+                                    style={{ cursor: 'pointer' }}
                                 >
                                     <td className="row-index">{idx + 1}</td>
                                     <td>
@@ -60,7 +94,12 @@ export function DetectionResultTable() {
                                     <td className="row-actions">
                                         <button
                                             className="table-action-btn"
-                                            onClick={() => copyToClipboard(idx)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (det.id) {
+                                                    copyToClipboard(det.id);
+                                                }
+                                            }}
                                             title="Salin Detail"
                                         >
                                             📋

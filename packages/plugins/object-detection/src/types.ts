@@ -10,6 +10,7 @@ export interface BoundingBox {
 }
 
 export interface Detection {
+    id?: string;        // Unique stable identifier for interaction (optional for engine/decoders, set during postprocess)
     classId: number;
     className: string;
     confidence: number; // 0.0 - 1.0
@@ -18,6 +19,7 @@ export interface Detection {
     width: number;
     height: number;
     color?: string;     // color code for bounding box rendering
+    label?: string;     // alias for className (optional support)
 }
 
 export interface DetectionResult {

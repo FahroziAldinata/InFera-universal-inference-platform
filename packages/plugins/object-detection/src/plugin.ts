@@ -207,7 +207,13 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
             : candidates;
 
         // 3. Non-Maximum Suppression
-        const detections = nonMaxSuppression(restored, this.config.iouThreshold);
+        const nmsDetections = nonMaxSuppression(restored, this.config.iouThreshold);
+        
+        const detections = nmsDetections.map((d, index) => ({
+            ...d,
+            id: `det_${Date.now()}_${index}_${Math.random().toString(36).substring(2, 9)}`,
+            label: d.className,
+        }));
 
         return {
             pluginId: this.id,

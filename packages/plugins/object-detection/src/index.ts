@@ -31,6 +31,8 @@ export type { NMSOptions } from './postprocess/nms';
 
 // Utils
 export { drawDetections } from './utils/canvas';
+export { screenToCanvas, canvasToScreen, imageToCanvas, canvasToImage } from './utils/transform';
+export { pointInBox, getBoxCenter, distanceToBox, findDetectionAtPoint } from './utils/geometry';
 
 // Visualization
 export type { DrawOptions, DrawStatistics } from './visualization/types';

@@ -132,7 +132,7 @@ model-package.zip
 - **`packages/core`**: Base types, validation helpers, and plugin managers.
 - **`packages/inference-engine`**: Low-level ONNX Runtime wrapper.
 - **`packages/plugins/image-classification`**: Image classification plugin.
-- **`packages/plugins/object-detection`**: High-performance object detection plugin with WebGPU fallbacks, UAMP zip loaders, canvas overlays, and benchmarks.
+- **`packages/plugins/object-detection`**: High-performance object detection plugin with WebGPU fallbacks, UAMP zip loaders, interactive canvas overlays (with spatial priority hit testing, 60fps DOM tooltips, selection rAF animations), and benchmarks.
 
 ---
 

@@ -37,6 +37,7 @@ export function drawBoundingBox(
     options: {
         lineWidth?: number;
         lineDash?: number[];
+        lineDashOffset?: number;
         cornerRadius?: number;
         fillOpacity?: number;
         opacity?: number;
@@ -45,6 +46,7 @@ export function drawBoundingBox(
     const {
         lineWidth = 3,
         lineDash = [],
+        lineDashOffset = 0,
         cornerRadius = 0,
         fillOpacity = 0,
         opacity = 1
@@ -60,6 +62,7 @@ export function drawBoundingBox(
     
     if (lineDash && lineDash.length > 0) {
         ctx.setLineDash(lineDash);
+        ctx.lineDashOffset = lineDashOffset;
     } else {
         ctx.setLineDash([]);
     }

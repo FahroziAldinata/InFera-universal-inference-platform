@@ -192,4 +192,48 @@ describe('drawDetections Integration (Tahap 5.5, 5.6 & 5.8)', () => {
         // Verify label does not print confidence percentage
         expect(ctx.fillText).toHaveBeenCalledWith('person', 16, 4); // Person label top (Y clamps)
     });
+
+    it('should render 500 detections quickly (Stress test)', () => {
+        const canvas = createMockCanvas(800, 800);
+        const manyDetections: Detection[] = [];
+        for (let i = 0; i < 500; i++) {
+            manyDetections.push({
+                id: `det_${i}`,
+                classId: i % 10,
+                className: `class_${i % 10}`,
+                confidence: 0.8,
+                x: (i * 2) % 600,
+                y: (i * 2) % 600,
+                width: 50,
+                height: 50,
+            });
+        }
+
+        const tStart = performance.now();
+        const stats = drawDetections(canvas, null, manyDetections);
+        const duration = performance.now() - tStart;
+
+        expect(stats.totalDetections).toBe(500);
+        expect(duration).toBeLessThan(100); // Should run in < 100ms
+        console.log(`Render of 500 detections took ${duration.toFixed(3)} ms`);
+    });
+
+    it('should correctly adapt coordinates and canvas dimensions for devicePixelRatio = 1, 2, and 3', () => {
+        const ratios = [1, 2, 3];
+        for (const dpr of ratios) {
+            // Mock window devicePixelRatio
+            (globalThis as any).window.devicePixelRatio = dpr;
+
+            const canvas = createMockCanvas(300, 300);
+            drawDetections(canvas, null, mockDetections);
+
+            expect(canvas.width).toBe(300 * dpr);
+            expect(canvas.height).toBe(300 * dpr);
+            expect(canvas.style.width).toBe('300px');
+            expect(canvas.style.height).toBe('300px');
+
+            const ctx = canvas.getContext('2d');
+            expect(ctx.scale).toHaveBeenLastCalledWith(dpr, dpr);
+        }
+    });
 });
