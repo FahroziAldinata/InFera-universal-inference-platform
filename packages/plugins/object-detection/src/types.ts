@@ -42,6 +42,7 @@ export interface ObjectDetectionConfig {
     iouThreshold: number;
     normalize: boolean;
     executionProviders?: string[];
+    preferredBackend?: 'auto' | 'webgpu' | 'wasm';
 }
 
 export interface ImageTensor {

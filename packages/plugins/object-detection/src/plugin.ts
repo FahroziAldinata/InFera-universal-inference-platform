@@ -7,11 +7,13 @@ import { letterboxImage } from './preprocess/letterbox';
 import { normalizePixels } from './preprocess/normalize';
 import { toCHWTensor } from './preprocess/tensor';
 import * as ort from 'onnxruntime-web';
-import { loadModel as loadModelHelper, createSession, disposeSession } from './runtime/session';
+import { loadModel as loadModelHelper, createSessionWithFallback, disposeSession } from './runtime/session';
 import { runInference } from './runtime/inference';
 import { decodeYOLO } from './postprocess/decoder';
 import { restoreBoxes } from './postprocess/restore_boxes';
 import { nonMaxSuppression } from './postprocess/nms';
+import { calculateMetrics, type InferenceMetrics } from './runtime/benchmark';
+import type { RuntimeBackend } from './runtime/capability';
 
 export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     readonly id = 'object-detection';
@@ -27,6 +29,7 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     private inputShape: number[] = [1, 3, DEFAULT_CONFIG.inputHeight, DEFAULT_CONFIG.inputWidth];
     private session: ort.InferenceSession | null = null;
     private lastPreprocessResult: PreprocessResult | null = null;
+    private backend: RuntimeBackend = 'wasm';
 
     constructor(config: Partial<ObjectDetectionConfig> = {}) {
         this.config = { ...DEFAULT_CONFIG, ...config };
@@ -39,7 +42,13 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     async loadModel(modelFile: File): Promise<void> {
         console.log(`[${this.id}] Loading model: ${modelFile.name}`);
         const modelData = await loadModelHelper(modelFile);
-        this.session = await createSession(modelData, this.config.executionProviders);
+        const { session, backend } = await createSessionWithFallback(
+            modelData,
+            this.config.preferredBackend || 'auto',
+            this.config.executionProviders
+        );
+        this.session = session;
+        this.backend = backend;
     }
 
     async dispose(): Promise<void> {
@@ -51,19 +60,23 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     }
 
     async predict(input: unknown): Promise<InferenceResult<DetectionResult>> {
-        const startTime = performance.now();
         if (!this.session) {
             throw new Error('Model belum dimuat. Panggil loadModel() terlebih dahulu.');
         }
 
         // 1. Preprocess
+        const tPreStart = performance.now();
         const preprocessed = await this.preprocess(input);
         this.lastPreprocessResult = preprocessed;
+        const preprocessTimeMs = performance.now() - tPreStart;
 
         // 2. Inference
+        const tInfStart = performance.now();
         const rawOutput = await runInference(this.session, preprocessed);
+        const inferenceTimeMs = performance.now() - tInfStart;
 
         // 3. Postprocess
+        const tPostStart = performance.now();
         const outputNames = this.session.outputNames;
         const primaryOutputName = outputNames[0] || 'output0';
         const primaryOutputTensor = rawOutput.outputs[primaryOutputName];
@@ -72,11 +85,19 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
         }
 
         const postprocessed = await this.postprocess(primaryOutputTensor);
-        const executionTimeMs = performance.now() - startTime;
+        const postprocessTimeMs = performance.now() - tPostStart;
+
+        const metrics = calculateMetrics(
+            preprocessTimeMs,
+            inferenceTimeMs,
+            postprocessTimeMs,
+            this.backend
+        );
 
         return {
             ...postprocessed,
-            executionTimeMs,
+            executionTimeMs: metrics.totalTimeMs,
+            metrics
         };
     }
 

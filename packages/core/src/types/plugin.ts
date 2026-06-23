@@ -15,6 +15,7 @@ export interface InferenceResult<TData = unknown> {
     executionTimeMs: number;
     data: TData;
     rawOutputShape?: number[];
+    metrics?: any;
 }
 
 export interface ModelMetadata {

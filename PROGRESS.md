@@ -302,9 +302,9 @@ Commit: `344572f`
 - [x] Implementasikan `src/runtime/benchmark.ts` dengan interface `InferenceMetrics` dan formula kalkulasi totalTimeMs, FPS, dan heap size memory usage
 - [x] Tambahkan unit test `benchmark.test.ts` (5 test cases) untuk memverifikasi keakuratan kalkulasi FPS, memory retrieval under browser vs Node.js, dan handling totalTimeMs = 0
 
-### Tahap 7.4 — Plugin Integration
-- [ ] Integrasikan preferredBackend & benchmark di `src/plugin.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 7.4 — Plugin Integration ✅
+- [x] Integrasikan `preferredBackend` konfigurasi di `src/types.ts`, `src/constants.ts`, dan loadModel/predict pipelines di `src/plugin.ts` untuk support auto capability detection dan benchmark tracking
+- [x] Verifikasi build & typecheck sukses (208 tests pass)
 
 ### Tahap 7.5 — Comprehensive Tests
 - [ ] Tambahkan unit & integration tests untuk metrics dan fallback
