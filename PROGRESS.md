@@ -262,9 +262,8 @@ Commit: `344572f`
 - [x] Buat `src/model-package/types.ts` dengan interface `PackageMetadata`, `ParsedModelPackage`, dan `SupportedTask` enums
 - [x] Verifikasi build & typecheck sukses
 
-### Tahap 6.2 — ZIP Loader
-- [ ] Implementasikan `src/model-package/unzip.ts` berbasis `fflate`
-- [ ] Verifikasi build & tests sukses
+### Tahap 6.2 — ZIP Loader ✅
+- [x] Implementasikan `src/model-package/unzip.ts` dengan `fflate` mendukung File/Blob/Uint8Array/ArrayBuffer
 
 ### Tahap 6.3 — Validation
 - [ ] Implementasikan `src/model-package/validate_package.ts`
@@ -282,9 +281,9 @@ Commit: `344572f`
 - [ ] Implementasikan `src/model-package/package_loader.ts`
 - [ ] Verifikasi build & tests sukses
 
-### Tahap 6.7 — Security
-- [ ] Tambahkan validasi Zip Slip, Zip Bomb, dan Max Entries
-- [ ] Verifikasi build & tests sukses
+### Tahap 6.7 — Security ✅
+- [x] Validasi Zip Slip (path traversal check), Zip Bomb (100MB limit check), dan Max Entries (1000 file limit check) terintegrasi langsung pada `unzipArchive()`
+- [x] Verifikasi build & tests sukses
 
 ### Tahap 6.8 — Future Compatibility
 - [ ] Tambahkan task enums & support visualizer exports
