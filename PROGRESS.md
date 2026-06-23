@@ -271,9 +271,8 @@ Commit: `344572f`
 ### Tahap 6.4 — Metadata Parser ✅
 - [x] Implementasikan `src/model-package/metadata_parser.ts` dengan validasi strict UTF-8 decoding, task enum check, dan support fallback default values
 
-### Tahap 6.5 — Labels Parser
-- [ ] Implementasikan `src/model-package/labels_parser.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 6.5 — Labels Parser ✅
+- [x] Implementasikan `src/model-package/labels_parser.ts` dengan dukungan parsing `labels.txt`, `labels.json` array, dan `labels.json` map dengan numeric index sorting
 
 ### Tahap 6.6 — Package Loader
 - [ ] Implementasikan `src/model-package/package_loader.ts`
