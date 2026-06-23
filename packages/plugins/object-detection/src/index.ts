@@ -20,9 +20,14 @@ export { normalizePixels } from './preprocess/normalize';
 export { letterboxImage } from './preprocess/letterbox';
 
 // Postprocess
+export { decodeYOLO } from './postprocess/decoder';
+export { decodeYOLOv5 } from './postprocess/yolov5_decoder';
+export { decodeYOLOv8 } from './postprocess/yolov8_decoder';
+export { restoreBoxes } from './postprocess/restore_boxes';
+export type { LetterboxMeta } from './postprocess/restore_boxes';
 export { calculateIoU } from './postprocess/iou';
 export { nonMaxSuppression } from './postprocess/nms';
-export { decodeOutput } from './postprocess/decoder';
+export type { NMSOptions } from './postprocess/nms';
 
 // Utils
 export { drawDetections } from './utils/canvas';

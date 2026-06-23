@@ -1,15 +1,36 @@
 import type { Tensor } from '@infera/core';
-import type { Detection, DetectionModelMetadata } from '../types';
+import type { Detection } from '../types';
+import type { DetectionModelMetadata } from '../model_metadata';
+import { decodeYOLOv5 } from './yolov5_decoder';
+import { decodeYOLOv8 } from './yolov8_decoder';
 
 /**
- * Decodes the output tensor of detection models based on architecture
+ * Auto-detects YOLO format from output tensor shape and dispatches to the correct decoder.
+ *
+ * YOLOv5: output shape [1, num_candidates, 5 + num_classes] — rows are candidates
+ * YOLOv8: output shape [1, 4 + num_classes, num_candidates] — columns are candidates
  */
-export function decodeOutput(
+export function decodeYOLO(
     outputTensor: Tensor,
-    modelMetadata: DetectionModelMetadata,
+    metadata: DetectionModelMetadata,
     confidenceThreshold: number
 ): Detection[] {
-    // Skeleton implementation for Phase 1
-    console.log('[decoder] Decoding output tensor with dims:', outputTensor.dims, 'architecture:', modelMetadata.architecture);
-    return [];
+    const dims = outputTensor.dims;
+    if (dims.length !== 3) {
+        throw new Error(`Unsupported YOLO output shape: [${dims.join(', ')}]. Expected rank 3.`);
+    }
+
+    const d1 = dims[1]!;
+    const d2 = dims[2]!;
+
+    // YOLOv8: d1 = 4 + num_classes (small), d2 = num_candidates (large)
+    // YOLOv5: d1 = num_candidates (large), d2 = 5 + num_classes (small)
+    const isYOLOv8 = (metadata.architecture === 'yolov8') || (d1 < d2 && d1 > 4);
+
+    if (isYOLOv8) {
+        return decodeYOLOv8(outputTensor, metadata, confidenceThreshold);
+    } else {
+        return decodeYOLOv5(outputTensor, metadata, confidenceThreshold);
+    }
 }
+

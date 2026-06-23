@@ -13,7 +13,10 @@ export interface Detection {
     classId: number;
     className: string;
     confidence: number; // 0.0 - 1.0
-    box: BoundingBox;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
     color?: string;     // color code for bounding box rendering
 }
 

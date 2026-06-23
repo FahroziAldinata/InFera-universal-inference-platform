@@ -1,5 +1,6 @@
 import type { InferencePlugin, Tensor, InferenceResult } from '@infera/core';
 import type { DetectionResult, ObjectDetectionConfig, PluginCapabilities, PreprocessResult } from './types';
+import type { DetectionModelMetadata } from './model_metadata';
 import { DEFAULT_CONFIG, DEFAULT_CAPABILITIES } from './constants';
 import { fileToImageData } from './preprocess/image_data';
 import { letterboxImage } from './preprocess/letterbox';
@@ -8,6 +9,9 @@ import { toCHWTensor } from './preprocess/tensor';
 import * as ort from 'onnxruntime-web';
 import { loadModel as loadModelHelper, createSession, disposeSession } from './runtime/session';
 import { runInference } from './runtime/inference';
+import { decodeYOLO } from './postprocess/decoder';
+import { restoreBoxes } from './postprocess/restore_boxes';
+import { nonMaxSuppression } from './postprocess/nms';
 
 export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     readonly id = 'object-detection';
@@ -22,6 +26,7 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     private labels: string[] = [];
     private inputShape: number[] = [1, 3, DEFAULT_CONFIG.inputHeight, DEFAULT_CONFIG.inputWidth];
     private session: ort.InferenceSession | null = null;
+    private lastPreprocessResult: PreprocessResult | null = null;
 
     constructor(config: Partial<ObjectDetectionConfig> = {}) {
         this.config = { ...DEFAULT_CONFIG, ...config };
@@ -53,6 +58,7 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
 
         // 1. Preprocess
         const preprocessed = await this.preprocess(input);
+        this.lastPreprocessResult = preprocessed;
 
         // 2. Inference
         const rawOutput = await runInference(this.session, preprocessed);
@@ -141,15 +147,42 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     }
 
     async postprocess(output: Tensor): Promise<InferenceResult<DetectionResult>> {
-        // Skeleton for Phase 1
         console.log(`[${this.id}] postprocess running...`);
+
+        const pre = this.lastPreprocessResult;
+
+        // Build metadata from current config and labels
+        const metadata: DetectionModelMetadata = {
+            inputWidth: this.config.inputWidth,
+            inputHeight: this.config.inputHeight,
+            classNames: this.labels,
+            outputNames: ['output0'],
+            confidenceThreshold: this.config.confidenceThreshold,
+            iouThreshold: this.config.iouThreshold,
+        };
+
+        // 1. Decode raw output tensor → candidate detections
+        const candidates = decodeYOLO(output, metadata, this.config.confidenceThreshold);
+
+        // 2. Restore coordinates from letterbox space → original image space
+        const restored = pre
+            ? restoreBoxes(candidates, {
+                scale: pre.scale,
+                padX: pre.padX,
+                padY: pre.padY,
+                originalWidth: pre.originalWidth,
+                originalHeight: pre.originalHeight,
+            })
+            : candidates;
+
+        // 3. Non-Maximum Suppression
+        const detections = nonMaxSuppression(restored, this.config.iouThreshold);
+
         return {
             pluginId: this.id,
             modelId: 'default',
             executionTimeMs: 0,
-            data: {
-                detections: [],
-            },
+            data: { detections },
             rawOutputShape: output.dims,
         };
     }

@@ -11,7 +11,7 @@ export function drawDetections(
     if (!ctx) return;
 
     for (const det of detections) {
-        const { x, y, width, height } = det.box;
+        const { x, y, width, height } = det;
         
         // Draw bounding box
         ctx.strokeStyle = det.color || '#ff0000';

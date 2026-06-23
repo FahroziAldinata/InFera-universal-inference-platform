@@ -12,8 +12,8 @@ vi.mock('onnxruntime-web', () => {
                     outputNames: ['output0'],
                     run: vi.fn().mockResolvedValue({
                         output0: {
-                            data: new Float32Array([0.1, 0.2, 0.3]),
-                            dims: [1, 3],
+                            data: new Float32Array([0, 0, 0, 0, 0.01, 0.01, 0.01, 0.01]),
+                            dims: [1, 1, 8],
                             type: 'float32',
                         },
                     }),
