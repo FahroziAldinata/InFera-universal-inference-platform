@@ -298,9 +298,9 @@ Commit: `344572f`
 - [x] Implementasikan `createSessionWithFallback()` di `src/runtime/session.ts` untuk memfasilitasi pembuatan session WebGPU dengan otomatis fallback ke WASM jika inisialisasi gagal
 - [x] Tambahkan unit test di `session.test.ts` (9 test cases) untuk memverifikasi inisialisasi sukses WebGPU, fallback inisialisasi, auto detection, dan execution provider overrides
 
-### Tahap 7.3 — Benchmark & Metrics
-- [ ] Implementasikan `src/runtime/benchmark.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 7.3 — Benchmark & Metrics ✅
+- [x] Implementasikan `src/runtime/benchmark.ts` dengan interface `InferenceMetrics` dan formula kalkulasi totalTimeMs, FPS, dan heap size memory usage
+- [x] Tambahkan unit test `benchmark.test.ts` (5 test cases) untuk memverifikasi keakuratan kalkulasi FPS, memory retrieval under browser vs Node.js, dan handling totalTimeMs = 0
 
 ### Tahap 7.4 — Plugin Integration
 - [ ] Integrasikan preferredBackend & benchmark di `src/plugin.ts`
