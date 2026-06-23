@@ -268,9 +268,8 @@ Commit: `344572f`
 ### Tahap 6.3 — Validation ✅
 - [x] Implementasikan `src/model-package/validate_package.ts` dengan deteksi file wajib/opsional, ekstensi tidak didukung, dan proteksi duplikasi ONNX
 
-### Tahap 6.4 — Metadata Parser
-- [ ] Implementasikan `src/model-package/metadata_parser.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 6.4 — Metadata Parser ✅
+- [x] Implementasikan `src/model-package/metadata_parser.ts` dengan validasi strict UTF-8 decoding, task enum check, dan support fallback default values
 
 ### Tahap 6.5 — Labels Parser
 - [ ] Implementasikan `src/model-package/labels_parser.ts`
