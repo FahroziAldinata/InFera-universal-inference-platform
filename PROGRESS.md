@@ -265,9 +265,8 @@ Commit: `344572f`
 ### Tahap 6.2 — ZIP Loader ✅
 - [x] Implementasikan `src/model-package/unzip.ts` dengan `fflate` mendukung File/Blob/Uint8Array/ArrayBuffer
 
-### Tahap 6.3 — Validation
-- [ ] Implementasikan `src/model-package/validate_package.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 6.3 — Validation ✅
+- [x] Implementasikan `src/model-package/validate_package.ts` dengan deteksi file wajib/opsional, ekstensi tidak didukung, dan proteksi duplikasi ONNX
 
 ### Tahap 6.4 — Metadata Parser
 - [ ] Implementasikan `src/model-package/metadata_parser.ts`
