@@ -230,13 +230,14 @@ Commit: `344572f`
 - [x] Tambahkan unit test `colors.test.ts` untuk verifikasi determinisme dan overflow palette
 - [x] Verifikasi build, typecheck, dan test sukses (105 tests pass)
 
-### Tahap 5.3 — Bounding Box Drawing
-- [ ] Implementasikan `src/visualization/draw_boxes.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 5.3 — Bounding Box Drawing ✅
+- [x] Implementasikan `src/visualization/draw_boxes.ts` dengan dukungan `lineDash`, `cornerRadius`, `fillOpacity`, dan `drawCenterPoint`
+- [x] Tambahkan unit test `draw_boxes.test.ts` untuk verifikasi box drawing, rounded corners, dashes, dan fillOpacity
 
-### Tahap 5.4 — Label Rendering
-- [ ] Implementasikan `src/visualization/draw_labels.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 5.4 — Label Rendering ✅
+- [x] Implementasikan `src/visualization/draw_labels.ts` dengan dukungan `labelPosition` (top, inside, bottom) dan canvas boundary clamping
+- [x] Tambahkan unit test di `draw_boxes.test.ts` untuk memverifikasi text baseline, background width/height, dan top boundary clamping
+- [x] Verifikasi build, typecheck, dan test sukses (128 tests pass)
 
 ### Tahap 5.5 — Canvas Rendering Engine
 - [ ] Implementasikan `drawDetections` returning `DrawStatistics`
