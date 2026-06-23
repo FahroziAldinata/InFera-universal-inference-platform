@@ -7,9 +7,13 @@
   "scripts": {
     "test": "pnpm exec turbo run test",
     "lint": "pnpm exec turbo run lint",
-    "build": "pnpm exec turbo run build",
-    "typecheck": "pnpm exec turbo run typecheck",
-    "dev": "pnpm exec turbo run dev"
+    "build": "pnpm exec turbo run build --filter=!@infera/docs",
+    "typecheck": "pnpm exec turbo run typecheck --filter=!@infera/docs",
+    "dev": "pnpm exec turbo run dev",
+    "docs:api": "typedoc --options typedoc.json",
+    "docs:build": "pnpm --filter @infera/docs build",
+    "docs:preview": "pnpm --filter @infera/docs preview",
+    "docs:dev": "pnpm --filter @infera/docs dev"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +26,7 @@
     "eslint-config-prettier": "^10.1.8",
     "@typescript-eslint/parser": "^8.61.1",
     "@typescript-eslint/eslint-plugin": "^8.61.1",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "typedoc": "^0.27.9"
   }
 }

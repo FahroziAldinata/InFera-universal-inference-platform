@@ -1,7 +1,7 @@
 {
     "name": "@infera/core",
-    "version": "0.1.0",
-    "private": true,
+    "version": "0.2.0",
+    "description": "Paket pondasi InFera — tipe dasar, validasi, dan plugin manager untuk platform inferensi ML browser-native.",
     "main": "src/index.ts",
     "types": "src/index.ts",
     "exports": {
@@ -15,6 +15,21 @@
       "lint": "echo \"no lint configured yet\"",
       "typecheck": "tsc --noEmit",
       "test": "vitest run"
+    },
+    "keywords": ["infera", "inference", "onnx", "machine-learning", "browser", "webgpu", "wasm"],
+    "author": "Fahrozi Aldinata <fahrozialdinata2@gmail.com>",
+    "license": "MIT",
+    "homepage": "https://FahroziAldinata.github.io/InFera-universal-inference-platform/",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/FahroziAldinata/InFera-universal-inference-platform.git",
+      "directory": "packages/core"
+    },
+    "bugs": {
+      "url": "https://github.com/FahroziAldinata/InFera-universal-inference-platform/issues"
+    },
+    "publishConfig": {
+      "access": "public"
     },
     "devDependencies": {
       "typescript": "^5.5.0",

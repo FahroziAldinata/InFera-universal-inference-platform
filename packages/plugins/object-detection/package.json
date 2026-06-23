@@ -1,7 +1,7 @@
 {
   "name": "@infera/plugin-object-detection",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
+  "description": "Plugin object detection untuk InFera — YOLOv5/v8, WebGPU, UAMP package loader, canvas overlay, dan benchmark real-time.",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "exports": {
@@ -15,6 +15,21 @@
     "lint": "echo \"no lint configured yet\"",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
+  },
+  "keywords": ["infera", "object-detection", "yolo", "yolov8", "yolov5", "onnx", "webgpu", "wasm", "browser", "bounding-box", "uamp"],
+  "author": "Fahrozi Aldinata <fahrozialdinata2@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://FahroziAldinata.github.io/InFera-universal-inference-platform/plugins/object-detection",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FahroziAldinata/InFera-universal-inference-platform.git",
+    "directory": "packages/plugins/object-detection"
+  },
+  "bugs": {
+    "url": "https://github.com/FahroziAldinata/InFera-universal-inference-platform/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@infera/core": "workspace:*",

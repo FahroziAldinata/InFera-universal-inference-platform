@@ -1,0 +1,18 @@
+# Source & Tests
+src/
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Config files
+tsconfig.json
+tsconfig.*.json
+vitest.config.*
+
+# Build artifacts
+.turbo/
+
+# Development
+node_modules/
+.env
+.env.*

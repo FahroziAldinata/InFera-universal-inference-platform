@@ -1,0 +1,19 @@
+# Source & Tests — tidak perlu di distribusikan
+src/
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Config files
+tsconfig.json
+tsconfig.*.json
+vitest.config.*
+*.turbo
+
+# Build artifacts (opsional, include dist/ untuk consumers)
+.turbo/
+
+# Development
+node_modules/
+.env
+.env.*

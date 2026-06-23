@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { drawDetections, findDetectionAtPoint, canvasToImage } from '@infera/plugin-object-detection';
 import { useDetectionStore } from '../store/detectionStore';
 import { useCanvasViewport } from '../hooks/useCanvasViewport';
@@ -46,18 +46,18 @@ export function DetectionCanvas() {
     useDetectionSelection();
 
     // Fits/centers canvas when a new image is loaded
-    const handleImageLoad = () => {
+    const handleImageLoad = useCallback(() => {
         const img = imageRef.current;
         if (img) {
             resetViewport(img.naturalWidth, img.naturalHeight);
         }
-    };
+    }, [resetViewport]);
 
     useEffect(() => {
         if (imageRef.current?.complete) {
             handleImageLoad();
         }
-    }, [imagePreviewUrl]);
+    }, [imagePreviewUrl, handleImageLoad]);
 
     // Track mouse pointer coordinates to determine box hover and tooltip updates
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {

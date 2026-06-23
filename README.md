@@ -1,86 +1,82 @@
 # InFera — Universal Inference Platform
 
-InFera is a browser-first, framework-agnostic, and light-weight machine learning inference platform designed to run ONNX models natively in the client browser with WebGPU hardware acceleration and WebAssembly (WASM) fallbacks.
+[![CI](https://github.com/FahroziAldinata/InFera-universal-inference-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/FahroziAldinata/InFera-universal-inference-platform/actions/workflows/ci.yml)
+[![npm @infera/core](https://img.shields.io/npm/v/@infera/core?label=%40infera%2Fcore&color=6366f1)](https://www.npmjs.com/package/@infera/core)
+[![npm @infera/plugin-object-detection](https://img.shields.io/npm/v/@infera/plugin-object-detection?label=%40infera%2Fplugin-object-detection&color=6366f1)](https://www.npmjs.com/package/@infera/plugin-object-detection)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![Docs](https://img.shields.io/badge/docs-online-6366f1)](https://FahroziAldinata.github.io/InFera-universal-inference-platform/)
+
+**InFera** adalah platform inferensi machine learning yang berjalan sepenuhnya di browser — browser-first, framework-agnostic, dipercepat WebGPU dengan fallback WASM otomatis.
+
+> **Dibuat oleh Fahrozi Aldinata dan dukungan AI.**
+
+📚 **[Baca Dokumentasi Lengkap →](https://FahroziAldinata.github.io/InFera-universal-inference-platform/)**
 
 ---
 
-## 1. Architecture Diagram
-
-The diagram below illustrates the platform flow from loading the model (either standalone or via the Universal Model Package) to preprocessing, execution, postprocessing, and visualization.
+## 1. Diagram Arsitektur
 
 ```mermaid
 graph TD
-    A[Model Package .onnx / .zip UAMP] --> B[Plugin Loader / Package Loader]
+    A["Model Package (.onnx / .zip UAMP)"] --> B[Plugin Loader / Package Loader]
     B --> C[Capability Detector]
-    
+
     C -->|WebGPU Available| D[ONNX WebGPU Session]
     C -->|WebGPU Unavailable / Fail| E[ONNX WASM Session]
-    
-    F[Input Image / Canvas / File] --> G[Preprocessing Module]
+
+    F["Input (Image / Canvas / File)"] --> G[Preprocessing Module]
     G -->|Resize / Letterbox / Normalize| H[Float32 Tensor]
-    
+
     H --> D
     H --> E
-    
+
     D --> I[Raw Output Tensor]
     E --> I
-    
+
     I --> J[Postprocessing Module]
-    J -->|YOLO v5/v8 Decode / Restore Coordinates / NMS| K[Detection Results]
-    
+    J -->|"YOLO v5/v8 Decode / Restore Coords / NMS"| K[Detection Results]
+
     K --> L[Canvas Visualizer / Overlay Rendering]
     K --> M[Inference Metrics & Benchmark System]
 ```
 
 ---
 
-## 2. Feature Matrix
+## 2. Matriks Fitur
 
-| Feature | Image Classification Plugin | Object Detection Plugin |
+| Fitur | Plugin Image Classification | Plugin Object Detection |
 | :--- | :---: | :---: |
-| **Model Formats** | ONNX | ONNX |
-| **Execution Backends** | WASM | WebGPU / WASM (with Auto Fallback) |
-| **Input Decoders** | Image, File | File, Blob, Image, ImageBitmap, ImageData |
-| **Preprocessing** | Resize, Softmax/Normalize | Scaled Letterboxing, HWC to CHW Conversion |
-| **Postprocessing** | Softmax, Top-K Sorting | Anchor-box Decoders (YOLOv5/v8), IoU, NMS |
-| **Dynamic Shapes** | Yes | Yes (Auto NCHW Shape Scaling) |
-| **ZIP Package Loader** | No | Yes (Universal Model Package - UAMP) |
-| **Retina/DPI Scaling** | No | Yes (DevicePixelRatio Auto Scaling) |
-| **Visualizer Overlay** | No | Yes (Bounding Boxes, Labels, cornerRadius) |
-| **Latencies Benchmarking**| No | Yes (Preprocess, Inference, Postprocess tracking) |
+| **Format Model** | ONNX | ONNX |
+| **Backend Eksekusi** | WASM | WebGPU / WASM (Auto Fallback) |
+| **Input yang Didukung** | Image, File | File, Blob, Image, ImageBitmap, ImageData |
+| **Preprocessing** | Resize, Normalize | Scaled Letterboxing, HWC→CHW |
+| **Postprocessing** | Softmax, Top-K | Anchor Decoder (YOLOv5/v8), IoU, NMS |
+| **Dynamic Shapes** | Ya | Ya (Auto NCHW Shape Scaling) |
+| **ZIP Package Loader** | Tidak | Ya (Universal Model Package — UAMP) |
+| **Retina/DPI Scaling** | Tidak | Ya (DevicePixelRatio Auto Scaling) |
+| **Visualizer Overlay** | Tidak | Ya (Bounding Box, Label, cornerRadius) |
+| **Benchmark Latensi** | Tidak | Ya (Preprocess, Inference, Postprocess) |
 
 ---
 
-## 3. Browser Compatibility Matrix
+## 3. Matriks Kompatibilitas Browser
 
-| Browser | WebAssembly (WASM) Backend | WebGPU Backend | Minimum Recommended Version |
+| Browser | Backend WASM | Backend WebGPU | Versi Minimum |
 | :--- | :---: | :---: | :---: |
-| **Google Chrome** | ✅ Supported | ✅ Supported | Chrome 113+ |
-| **Microsoft Edge** | ✅ Supported | ✅ Supported | Edge 113+ |
-| **Opera** | ✅ Supported | ✅ Supported | Opera 99+ |
-| **Mozilla Firefox**| ✅ Supported | ⚠️ Flag Enabled | Firefox 115+ (enable `dom.webgpu.enabled`) |
-| **Apple Safari** | ✅ Supported | ⚠️ Experimental | Safari 17+ (enable WebGPU feature flag) |
-| **Mobile Browsers**| ✅ Supported | ❌ Experimental | Android Chrome 121+ (iOS WebGPU experimental) |
+| **Google Chrome** | ✅ | ✅ | Chrome 113+ |
+| **Microsoft Edge** | ✅ | ✅ | Edge 113+ |
+| **Opera** | ✅ | ✅ | Opera 99+ |
+| **Mozilla Firefox** | ✅ | ⚠️ Perlu Flag | Firefox 115+ |
+| **Apple Safari** | ✅ | ⚠️ Eksperimental | Safari 17+ |
+| **Mobile Chrome** | ✅ | ✅ | Chrome 121+ |
 
 ---
 
-## 4. WebGPU Support Table
+## 4. Tabel Benchmark Performa
 
-| Operating System | Chrome / Edge | Firefox | Safari |
-| :--- | :---: | :---: | :---: |
-| **Windows** | ✅ Out-of-the-box (D3D12/Vulkan) | ⚠️ Under Flag | ❌ N/A |
-| **macOS** | ✅ Out-of-the-box (Metal) | ⚠️ Under Flag | ⚠️ Experimental Flag |
-| **Linux** | ✅ Out-of-the-box (Vulkan) | ⚠️ Under Flag | ❌ N/A |
-| **Android** | ✅ Out-of-the-box (Vulkan) | ❌ N/A | ❌ N/A |
-| **iOS / iPadOS** | ❌ N/A | ❌ N/A | ⚠️ Experimental Flag |
+*Latensi tipikal diukur pada Intel Core i7 (Gen 12) / RTX 3060 Laptop GPU dengan ukuran input 640×640.*
 
----
-
-## 5. Performance Benchmark Table
-
-*Typical execution latencies measured on an Intel Core i7 (12th Gen) / RTX 3060 Laptop GPU with a 640x640 input image size.*
-
-| Backend | Preprocess Latency | Inference Latency | Postprocess Latency | Total Time | FPS |
+| Backend | Latensi Preprocess | Latensi Inference | Latensi Postprocess | Total | FPS |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **WebAssembly (WASM)** | ~8 ms | ~120 ms | ~4 ms | ~132 ms | ~7.5 FPS |
 | **WebAssembly SIMD** | ~8 ms | ~45 ms | ~4 ms | ~57 ms | ~17.5 FPS |
@@ -88,76 +84,147 @@ graph TD
 
 ---
 
-## 6. Universal Model Package (UAMP) Specification
+## 5. Universal Model Package (UAMP)
 
-UAMP is a browser-native archive specification package (`.zip`) developed for packaging model binaries, labels, and configurations into a single deployable asset.
+UAMP adalah spesifikasi paket model berbasis arsip `.zip` browser-native yang menyatukan bobot model, label, dan konfigurasi dalam satu file yang dapat di-deploy.
 
-### Zip Archive Structure
+### Struktur Arsip
 
 ```
 model-package.zip
-├── model.onnx           # ONNX model weights file (Required)
-├── metadata.json        # Strict configuration details (Required)
-├── labels.txt           # Line-separated plain text labels list (Optional)
-├── labels.json          # Key-value map or array labels representation (Optional)
-├── README.md            # Model description and licensing information (Optional)
-└── thumbnail.png        # Icon or representative image of the model (Optional)
+├── model.onnx           # Bobot model ONNX (WAJIB)
+├── metadata.json        # Konfigurasi lengkap (WAJIB)
+├── labels.txt           # Label satu per baris (Opsional)
+├── labels.json          # Label array/key-value (Opsional)
+├── README.md            # Deskripsi model (Opsional)
+└── thumbnail.png        # Gambar representatif (Opsional)
 ```
 
-### Metadata JSON Schema (`metadata.json`)
+### Jaminan Keamanan
+- **Zip Slip Protection** — Menolak path `../` dan traversal absolut
+- **Zip Bomb Defense** — Batas dekompresi 100MB per entri
+- **File Entry Ceiling** — Maksimal 1.000 entri per archive
 
-```json
-{
-  "id": "yolov8n-coco",
-  "name": "YOLOv8n Object Detection",
-  "version": "1.0.0",
-  "task": "object-detection",
-  "inputShape": [1, 3, 640, 640],
-  "architecture": "yolov8",
-  "confidenceThreshold": 0.25,
-  "iouThreshold: 0.45
-}
-```
-
-### Security Guarantees
-- **Zip Slip Protection**: Disallows entries with relative paths containing `../` or absolute root traversals.
-- **Zip Bomb Defense**: Restricts decompression size to a maximum of 100MB per file entry to avoid memory allocation failures.
-- **File Entry Ceiling**: Caps total entries to a maximum of 1,000 files to prevent resource exhaustion attacks.
+📖 [Baca Spesifikasi UAMP Lengkap →](https://FahroziAldinata.github.io/InFera-universal-inference-platform/uamp/)
 
 ---
 
-## 7. Project Monorepo Layout
+## 6. Layout Monorepo
 
-- **`apps/web-client`**: A web application built with React + Vite + TypeScript to run browser inference.
-- **`packages/core`**: Base types, validation helpers, and plugin managers.
-- **`packages/inference-engine`**: Low-level ONNX Runtime wrapper.
-- **`packages/plugins/image-classification`**: Image classification plugin.
-- **`packages/plugins/object-detection`**: High-performance object detection plugin with WebGPU fallbacks, UAMP zip loaders, interactive canvas overlays (with spatial priority hit testing, 60fps DOM tooltips, selection rAF animations), and benchmarks.
+```
+InFera/
+├── apps/
+│   ├── web-client/          ← Aplikasi web React + Vite + TypeScript
+│   └── docs/                ← Website dokumentasi VitePress
+├── packages/
+│   ├── core/                ← Tipe dasar, validasi, plugin manager
+│   ├── inference-engine/    ← ONNX Runtime wrapper
+│   └── plugins/
+│       ├── object-detection/       ← Plugin object detection (YOLOv5/v8)
+│       └── image-classification/   ← Plugin klasifikasi gambar
+├── package.json             ← Root workspace (pnpm + Turborepo)
+├── turbo.json               ← Build pipeline Turborepo
+└── pnpm-workspace.yaml      ← Definisi workspace pnpm
+```
 
 ---
 
-## 8. Development & Getting Started
+## 7. Panduan Pengembangan
 
-### Prerequisites
+### Prasyarat
 
-- Node.js (v20+ recommended)
-- `pnpm` (v11.8.0 recommended)
+- Node.js v20+
+- pnpm v11.8.0+
+- Browser Chrome 113+ (untuk WebGPU)
 
-### Installation
+### Instalasi
 
 ```bash
+# Clone repository
+git clone https://github.com/FahroziAldinata/InFera-universal-inference-platform.git
+cd InFera-universal-inference-platform
+
+# Instal semua dependensi
 pnpm install
 ```
 
-### Workspace Validation Commands
+### Perintah Workspace
 
 ```bash
-# Build all packages in the workspace
+# Build semua package
 pnpm build
 
-# Run type check on all workspace packages
+# Type check semua package
 pnpm typecheck
 
-# Run test suites in all workspace packages
+# Jalankan test suite
 pnpm test
+
+# Jalankan linter
+pnpm lint
+
+# Jalankan web client (mode development)
+pnpm dev
+
+# Build dokumentasi
+pnpm docs:build
+
+# Preview dokumentasi lokal
+pnpm docs:preview
 ```
+
+### Quick Start — Object Detection
+
+```typescript
+import { ObjectDetectionPlugin } from '@infera/plugin-object-detection';
+
+const plugin = new ObjectDetectionPlugin({
+  inputWidth: 640,
+  inputHeight: 640,
+  confidenceThreshold: 0.25,
+  iouThreshold: 0.45,
+  preferredBackend: 'auto',  // WebGPU jika tersedia, WASM sebagai fallback
+  enableMetrics: true,
+});
+
+await plugin.init();
+await plugin.loadModel(modelFile);
+
+const result = await plugin.predict(imageElement);
+console.log(result.detections); // [{ label: 'person', confidence: 0.89, ... }]
+console.log(result.metrics);    // { inferenceTimeMs: 14.5, fps: 68.9, backend: 'webgpu' }
+```
+
+---
+
+## 8. Dokumentasi
+
+📚 Website dokumentasi lengkap tersedia di:
+
+**[https://FahroziAldinata.github.io/InFera-universal-inference-platform/](https://FahroziAldinata.github.io/InFera-universal-inference-platform/)**
+
+| Halaman | Link |
+|---|---|
+| Memulai | [/guide/getting-started](https://FahroziAldinata.github.io/InFera-universal-inference-platform/guide/getting-started) |
+| Arsitektur | [/guide/architecture](https://FahroziAldinata.github.io/InFera-universal-inference-platform/guide/architecture) |
+| Plugin Object Detection | [/plugins/object-detection](https://FahroziAldinata.github.io/InFera-universal-inference-platform/plugins/object-detection) |
+| Plugin Image Classification | [/plugins/image-classification](https://FahroziAldinata.github.io/InFera-universal-inference-platform/plugins/image-classification) |
+| Spesifikasi UAMP | [/uamp/](https://FahroziAldinata.github.io/InFera-universal-inference-platform/uamp/) |
+| Benchmark | [/benchmark/](https://FahroziAldinata.github.io/InFera-universal-inference-platform/benchmark/) |
+| Changelog | [/changelog/](https://FahroziAldinata.github.io/InFera-universal-inference-platform/changelog/) |
+
+---
+
+## 9. Kontribusi
+
+Kontribusi sangat disambut! Silakan buka issue atau pull request di [GitHub repository](https://github.com/FahroziAldinata/InFera-universal-inference-platform).
+
+---
+
+## 10. Lisensi
+
+InFera dirilis di bawah [Lisensi MIT](./LICENSE).
+
+---
+
+> **Dibuat oleh [Fahrozi Aldinata](https://github.com/FahroziAldinata) dan dukungan AI.**

@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useDetectionStore } from '../store/detectionStore';
 import { downloadCanvasResult } from '../utils/exportDetection';
+import { EXPORT_FORMATTERS, downloadStringAsFile } from '../utils/exportFormatter';
 
 export function DetectionToolbar() {
     const {
@@ -10,6 +12,8 @@ export function DetectionToolbar() {
         showCrosshair,
         showTooltip,
         selectedDetectionId,
+        detections,
+        imageFile,
         setShowLabels,
         setShowBoxes,
         setShowConfidence,
@@ -19,6 +23,8 @@ export function DetectionToolbar() {
         setPan,
         focusDetection,
     } = useDetectionStore();
+
+    const [selectedFormatId, setSelectedFormatId] = useState('json');
 
     const isDone = step === 'done';
 
@@ -35,6 +41,28 @@ export function DetectionToolbar() {
             alert(`Failed to export image: ${e instanceof Error ? e.message : String(e)}`);
         }
     }
+
+    const handleMetadataExport = () => {
+        const formatter = EXPORT_FORMATTERS.find(f => f.id === selectedFormatId);
+        if (!formatter) return;
+
+        const img = document.querySelector('.canvas-source-img') as HTMLImageElement | null;
+        const imageWidth = img?.naturalWidth || 640;
+        const imageHeight = img?.naturalHeight || 640;
+        const imageName = imageFile?.name || 'image.jpg';
+
+        const content = formatter.format(detections, {
+            imageName,
+            imageWidth,
+            imageHeight
+        });
+
+        const dotIdx = imageName.lastIndexOf('.');
+        const baseName = dotIdx !== -1 ? imageName.substring(0, dotIdx) : imageName;
+        const exportFilename = `${baseName}_detections.${formatter.extension}`;
+        
+        downloadStringAsFile(content, exportFilename, formatter.mimeType);
+    };
 
     const handleActualSize = () => {
         setZoom(1.0);
@@ -143,13 +171,32 @@ export function DetectionToolbar() {
                 <>
                     <div className="toolbar-divider" />
                     <div className="export-controls-row">
-                        <span className="export-label">Ekspor Hasil</span>
+                        <span className="export-label">Ekspor Gambar</span>
                         <div className="export-btn-group">
                             <button className="btn-secondary btn-export" onClick={() => handleExport('png')}>
                                 PNG
                             </button>
                             <button className="btn-secondary btn-export" onClick={() => handleExport('jpeg')}>
                                 JPEG
+                            </button>
+                        </div>
+                    </div>
+                    <div className="toolbar-divider" />
+                    <div className="export-controls-row">
+                        <span className="export-label">Ekspor Anotasi</span>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                            <select
+                                className="select-input"
+                                value={selectedFormatId}
+                                onChange={(e) => setSelectedFormatId(e.target.value)}
+                                style={{ flex: 1, minWidth: 0 }}
+                            >
+                                {EXPORT_FORMATTERS.map(f => (
+                                    <option key={f.id} value={f.id}>{f.name}</option>
+                                ))}
+                            </select>
+                            <button className="btn-primary" onClick={handleMetadataExport} style={{ padding: '5px 10px', fontSize: '11px', whiteSpace: 'nowrap' }}>
+                                Ekspor
                             </button>
                         </div>
                     </div>

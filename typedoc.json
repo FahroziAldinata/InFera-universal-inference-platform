@@ -1,0 +1,22 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "InFera — Universal Inference Platform",
+  "entryPoints": [
+    "packages/core/src/index.ts",
+    "packages/inference-engine/src/index.ts",
+    "packages/plugins/object-detection/src/index.ts",
+    "packages/plugins/image-classification/src/index.ts"
+  ],
+  "entryPointStrategy": "packages",
+  "out": "apps/docs/api/generated",
+  "plugin": [],
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "includeVersion": true,
+  "navigationLinks": {
+    "Docs": "https://FahroziAldinata.github.io/InFera-universal-inference-platform/",
+    "GitHub": "https://github.com/FahroziAldinata/InFera-universal-inference-platform"
+  }
+}

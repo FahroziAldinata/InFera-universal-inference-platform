@@ -1,8 +1,7 @@
 {
   "name": "@infera/inference-engine",
-  "version": "0.1.0",
-  "description": "",
-  "private": true,
+  "version": "0.2.0",
+  "description": "ONNX Runtime wrapper untuk InFera — deteksi kapabilitas WebGPU/WASM otomatis dengan graceful fallback.",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
@@ -11,9 +10,21 @@
     "typecheck": "tsc --noEmit",
     "test": "echo \"no test configured yet\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["infera", "onnx", "onnxruntime", "webgpu", "wasm", "inference-engine", "browser", "machine-learning"],
+  "author": "Fahrozi Aldinata <fahrozialdinata2@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://FahroziAldinata.github.io/InFera-universal-inference-platform/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FahroziAldinata/InFera-universal-inference-platform.git",
+    "directory": "packages/inference-engine"
+  },
+  "bugs": {
+    "url": "https://github.com/FahroziAldinata/InFera-universal-inference-platform/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "dependencies": {
     "@infera/core": "workspace:*",

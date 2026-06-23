@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Detection } from '@infera/plugin-object-detection';
+import type { SavedModel } from '../db/detectionDb';
 
 export type DetectionStep =
     | 'idle'
@@ -9,6 +11,17 @@ export type DetectionStep =
     | 'done'
     | 'error';
 
+export interface InferenceMetrics {
+    backend: 'webgpu' | 'wasm';
+    preprocessTimeMs: number;
+    inferenceTimeMs: number;
+    postprocessTimeMs: number;
+    totalTimeMs: number;
+    fps: number;
+    memoryUsageMB?: number;
+    timestamp?: number;
+}
+
 export interface DetectionState {
     step: DetectionStep;
     modelName: string | null;
@@ -17,8 +30,11 @@ export interface DetectionState {
     imageFile: File | null;
     imagePreviewUrl: string | null;
     detections: Detection[];
-    metrics: any | null; // InferenceMetrics
+    metrics: InferenceMetrics | null;
     errorMessage: string | null;
+
+    // Cache state
+    cachedModels: SavedModel[];
 
     // Preferences
     preferredBackend: 'auto' | 'webgpu' | 'wasm';
@@ -39,8 +55,9 @@ export interface DetectionState {
     setStep: (step: DetectionStep) => void;
     setModelInfo: (name: string, labels: string[], shape: number[]) => void;
     setImageFile: (file: File, previewUrl: string) => void;
-    setDetections: (detections: Detection[], metrics: any) => void;
+    setDetections: (detections: Detection[], metrics: InferenceMetrics | null) => void;
     setError: (message: string) => void;
+    setCachedModels: (models: SavedModel[]) => void;
     setPreferredBackend: (backend: 'auto' | 'webgpu' | 'wasm') => void;
     setEnableMetrics: (enable: boolean) => void;
     setShowLabels: (show: boolean) => void;
@@ -67,6 +84,7 @@ const initialState = {
     detections: [],
     metrics: null,
     errorMessage: null,
+    cachedModels: [],
     preferredBackend: 'auto' as const,
     enableMetrics: true,
     showLabels: true,
@@ -82,8 +100,10 @@ const initialState = {
     selectedDetectionIds: [],
 };
 
-export const useDetectionStore = create<DetectionState>((set, get) => ({
-    ...initialState,
+export const useDetectionStore = create<DetectionState>()(
+    persist(
+        (set, get) => ({
+            ...initialState,
 
     setStep: (step) => set({ step }),
 
@@ -100,7 +120,15 @@ export const useDetectionStore = create<DetectionState>((set, get) => ({
             imagePreviewUrl: null,
         }),
 
-    setImageFile: (file, previewUrl) =>
+    setImageFile: (file, previewUrl) => {
+        const state = get();
+        if (state.imagePreviewUrl) {
+            try {
+                URL.revokeObjectURL(state.imagePreviewUrl);
+            } catch (e) {
+                console.warn('Failed to revoke object URL', e);
+            }
+        }
         set({
             step: 'image-ready',
             imageFile: file,
@@ -114,7 +142,8 @@ export const useDetectionStore = create<DetectionState>((set, get) => ({
             hoveredDetectionId: null,
             selectedDetectionId: null,
             selectedDetectionIds: [],
-        }),
+        });
+    },
 
     setDetections: (detections, metrics) =>
         set({
@@ -129,6 +158,8 @@ export const useDetectionStore = create<DetectionState>((set, get) => ({
             step: 'error',
             errorMessage: message,
         }),
+
+    setCachedModels: (models) => set({ cachedModels: models }),
 
     setPreferredBackend: (backend) => set({ preferredBackend: backend }),
     setEnableMetrics: (enable) => set({ enableMetrics: enable }),
@@ -164,5 +195,35 @@ export const useDetectionStore = create<DetectionState>((set, get) => ({
         });
     },
 
-    reset: () => set(initialState),
-}));
+    reset: () => {
+        const state = get();
+        if (state.imagePreviewUrl) {
+            try {
+                URL.revokeObjectURL(state.imagePreviewUrl);
+            } catch (e) {
+                console.warn('Failed to revoke object URL', e);
+            }
+        }
+        set(initialState);
+    },
+        }),
+        {
+            name: 'infera-detection-store',
+            storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({
+                preferredBackend: state.preferredBackend,
+                enableMetrics: state.enableMetrics,
+                showLabels: state.showLabels,
+                showBoxes: state.showBoxes,
+                showConfidence: state.showConfidence,
+                showCrosshair: state.showCrosshair,
+                showTooltip: state.showTooltip,
+                zoom: state.zoom,
+                panX: state.panX,
+                panY: state.panY,
+                selectedDetectionId: state.selectedDetectionId,
+                selectedDetectionIds: state.selectedDetectionIds,
+            }),
+        }
+    )
+);

@@ -1,12 +1,22 @@
+import { useEffect } from 'react';
 import { DetectionUploader } from '../components/DetectionUploader';
 import { DetectionToolbar } from '../components/DetectionToolbar';
 import { DetectionCanvas } from '../components/DetectionCanvas';
 import { MetricsPanel } from '../components/MetricsPanel';
 import { DetectionResultTable } from '../components/DetectionResultTable';
+import { ModelManagerPanel } from '../components/ModelManagerPanel';
 import { useDetectionStore } from '../store/detectionStore';
+import { disposeActivePluginInstance } from '../hooks/useObjectDetection';
 
 export function ObjectDetectionPage() {
     const { errorMessage } = useDetectionStore();
+
+    useEffect(() => {
+        return () => {
+            console.log('[ObjectDetectionPage] Page unmounted, cleaning up runtime resources...');
+            disposeActivePluginInstance();
+        };
+    }, []);
 
     return (
         <div className="workspace">
@@ -14,6 +24,8 @@ export function ObjectDetectionPage() {
             <aside className="sidebar">
                 <div className="section-header">MODEL & INPUT</div>
                 <DetectionUploader />
+                
+                <ModelManagerPanel />
                 
                 <div className="sidebar-divider" />
                 

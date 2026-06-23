@@ -11,10 +11,10 @@ Terakhir diperbarui: **24 Juni 2026**
 | Tahap (sesuai Roadmap TDD)              | Status         |
 |------------------------------------------|----------------|
 | Tahap 1: Core Foundation & MVP           | ✅ Selesai     |
-| Tahap 2: Object Detection & Segmentation | 🏃 In Progress |
+| Tahap 2: Object Detection & Segmentation | ✅ Selesai     |
 | Tahap 3: Tabular & OCR                   | ⬜ Belum mulai |
 | Tahap 4: Plugin SDK Terbuka              | ⬜ Belum mulai |
-| Tahap 5: Produksi & WebGPU               | ⬜ Belum mulai |
+| Tahap 5: Produksi & WebGPU               | ✅ Selesai     |
 
 ---
 
@@ -350,18 +350,27 @@ Commit: `344572f`
 
 ---
 
-## 15. Next Steps
+## 15. Object Detection Phase 10 (Production Readiness & Release) ✅
+
+- [x] **IndexedDB & Cache Management (Stage 10.1)**: Migrasi schema IndexedDB dengan versioning, auto corruption recovery, favoritisasi model cache, LRU eviction policy (maksimal 10 model), dan sidebar `ModelManagerPanel`.
+- [x] **Extensible Export System (Stage 10.2)**: Pembuatan registry formatter-based exporter untuk mengunduh anotasi hasil deteksi (mendukung JSON, CSV, COCO JSON, YOLO normalized, Pascal VOC XML, dan Label Studio JSON).
+- [x] **Isolated Web Worker (Stage 10.3)**: Isolasi post-processing (decode, restore coords, NMS) ke background thread via `postprocess.worker.ts` dengan transferable ArrayBuffers, pembatalan via AbortController, pemulihan otomatis dari crash, dan main-thread fallback dynamic import.
+- [x] **Zustand Persistence & Virtualization (Stage 10.4)**: Persistensi store dengan filter lightweight (viewport, preferensi toolbar, history benchmark, selected IDs), menghindari data gambar dan session ONNX. Implementasi custom React spacer-row virtualization pada result table untuk render 5,000+ baris di 60 FPS.
+- [x] **Error Boundary & Memory Safety (Stage 10.5)**: Global `<ErrorBoundary>` dengan opsi soft restart, restart worker, clean cache, dan factory reset. Pelepasan URL objek preview saat ganti gambar / reset, serta disposal total resources ONNX/Worker pada unmount.
+- [x] **Release Engineering (Stage 10.6)**: Kenaikan versi package ke `0.2.0`, validasi tarball via `npm pack`, serta validasi build/typecheck/vitest (252 tests)/eslint pass sempurna.
+
+---
+
+## 16. Next Steps
 
 Urutan logis berikutnya:
 
-1. **Batch Inference (Phase 10)**:
+1. **Batch Inference (Phase 11)**:
    - Antrian inferensi untuk pemrosesan banyak gambar secara serial/paralel di browser.
-2. **Universal Inference SDK (Phase 12)**:
+2. **Annotation Tooling (Phase 12)**:
+   - Tool pelabelan gambar interaktif di dalam browser.
+3. **Universal Inference SDK (Phase 13)**:
    - Abstraksi menjadi SDK modular untuk framework frontend lainnya.
-3. **Stabilization**:
-   - Fix `@infera/core` alias di `packages/inference-engine` — hapus workaround relative import
-   - Unit test pertama (Vitest) — `validateModelFile()` dan `PluginManager` di `packages/core`
-4. **IndexedDB (Dexie.js)** — histori inferensi di `web-client/src/db/`
 
 ---
 

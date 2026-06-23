@@ -46,12 +46,7 @@ export function useCanvasViewport(containerRef: React.RefObject<HTMLDivElement |
         const iy = (my - panY) / zoom;
 
         const zoomFactor = 1.15;
-        let newZoom = zoom;
-        if (e.deltaY < 0) {
-            newZoom = zoom * zoomFactor;
-        } else {
-            newZoom = zoom / zoomFactor;
-        }
+        let newZoom = e.deltaY < 0 ? zoom * zoomFactor : zoom / zoomFactor;
 
         // Apply zoom boundary constraints (0.1x to 20x)
         newZoom = Math.max(0.1, Math.min(newZoom, 20));

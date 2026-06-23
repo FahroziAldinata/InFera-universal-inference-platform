@@ -65,7 +65,7 @@ export function DetectionUploader() {
                     <select
                         className="select-input"
                         value={preferredBackend}
-                        onChange={(e: any) => setPreferredBackend(e.target.value)}
+                        onChange={(e) => setPreferredBackend(e.target.value as 'auto' | 'webgpu' | 'wasm')}
                         disabled={loading}
                     >
                         <option value="auto">Auto (WebGPU / WASM)</option>

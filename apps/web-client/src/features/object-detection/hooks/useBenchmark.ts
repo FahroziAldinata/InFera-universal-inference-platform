@@ -28,6 +28,7 @@ export function useBenchmark() {
                 fps: metrics.fps,
                 timestamp: metrics.timestamp || Date.now(),
             };
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setHistory((prev) => [record, ...prev].slice(0, 10)); // Keep last 10 runs
         }
     }, [metrics, modelName]);
