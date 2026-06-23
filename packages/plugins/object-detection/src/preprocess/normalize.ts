@@ -1,25 +1,23 @@
 /**
- * Normalization helper converting RGBA to NCHW Float32Array format
+ * Normalizes pixel values of ImageData from [0-255] to [0.0-1.0], discarding the Alpha channel.
+ * Output is a flat Float32Array in HWC format: [R0, G0, B0, R1, G1, B1, ...]
  */
 export function normalizePixels(
-    rgba: Uint8ClampedArray,
-    normalize: boolean
+    imageData: ImageData
 ): Float32Array {
-    const totalPixels = rgba.length / 4;
-    const floatData = new Float32Array(3 * totalPixels);
+    const { data } = imageData;
+    const totalPixels = imageData.width * imageData.height;
+    const normalized = new Float32Array(totalPixels * 3);
+
     for (let i = 0; i < totalPixels; i++) {
-        const r = rgba[i * 4]!;
-        const g = rgba[i * 4 + 1]!;
-        const b = rgba[i * 4 + 2]!;
-        if (normalize) {
-            floatData[i] = r / 255.0;
-            floatData[i + totalPixels] = g / 255.0;
-            floatData[i + totalPixels * 2] = b / 255.0;
-        } else {
-            floatData[i] = r;
-            floatData[i + totalPixels] = g;
-            floatData[i + totalPixels * 2] = b;
-        }
+        const r = data[i * 4]!;
+        const g = data[i * 4 + 1]!;
+        const b = data[i * 4 + 2]!;
+
+        normalized[i * 3] = r / 255.0;
+        normalized[i * 3 + 1] = g / 255.0;
+        normalized[i * 3 + 2] = b / 255.0;
     }
-    return floatData;
+
+    return normalized;
 }

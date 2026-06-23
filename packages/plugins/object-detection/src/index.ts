@@ -6,6 +6,10 @@ export type {
     PluginCapabilities,
     DetectionModelMetadata,
     ObjectDetectionConfig,
+    ImageTensor,
+    ResizeResult,
+    LetterboxResult,
+    PreprocessResult,
 } from './types';
 export { DEFAULT_CONFIG, DEFAULT_CAPABILITIES } from './constants';
 export { getModelMetadata } from './metadata';
@@ -14,7 +18,6 @@ export { getModelMetadata } from './metadata';
 export { resizeImage } from './preprocess/resize';
 export { normalizePixels } from './preprocess/normalize';
 export { letterboxImage } from './preprocess/letterbox';
-export type { LetterboxInfo } from './preprocess/letterbox';
 
 // Postprocess
 export { calculateIoU } from './postprocess/iou';

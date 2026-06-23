@@ -1,16 +1,35 @@
+import type { ResizeResult } from '../types';
+
 /**
- * Preprocess utility for resizing input image using canvas
+ * Resizes an ImageData object to target width and height using OffscreenCanvas
  */
-export async function resizeImage(
-    input: HTMLImageElement | ImageBitmap,
+export function resizeImage(
+    imageData: ImageData,
     targetWidth: number,
     targetHeight: number
-): Promise<ImageData> {
-    const canvas = new OffscreenCanvas(targetWidth, targetHeight);
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        throw new Error('Canvas 2D context is not available');
+): ResizeResult {
+    const srcWidth = imageData.width;
+    const srcHeight = imageData.height;
+
+    const srcCanvas = new OffscreenCanvas(srcWidth, srcHeight);
+    const srcCtx = srcCanvas.getContext('2d');
+    if (!srcCtx) {
+        throw new Error('Could not get source OffscreenCanvas 2D context');
     }
-    ctx.drawImage(input, 0, 0, targetWidth, targetHeight);
-    return ctx.getImageData(0, 0, targetWidth, targetHeight);
+    srcCtx.putImageData(imageData, 0, 0);
+
+    const destCanvas = new OffscreenCanvas(targetWidth, targetHeight);
+    const destCtx = destCanvas.getContext('2d');
+    if (!destCtx) {
+        throw new Error('Could not get destination OffscreenCanvas 2D context');
+    }
+
+    destCtx.drawImage(srcCanvas, 0, 0, targetWidth, targetHeight);
+    const resizedData = destCtx.getImageData(0, 0, targetWidth, targetHeight);
+
+    return {
+        imageData: resizedData,
+        width: targetWidth,
+        height: targetHeight,
+    };
 }

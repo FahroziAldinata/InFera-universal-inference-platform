@@ -2,7 +2,7 @@
 
 > Dokumen ini merangkum progress implementasi berdasarkan TDD `universal_inference_platform_tdd.md`, mengikuti roadmap di bagian 12 (Tahap 1: Core Foundation & MVP).
 
-Terakhir diperbarui: **23 Juni 2026**
+Terakhir diperbarui: **24 Juni 2026**
 
 ---
 
@@ -11,7 +11,7 @@ Terakhir diperbarui: **23 Juni 2026**
 | Tahap (sesuai Roadmap TDD)              | Status         |
 |------------------------------------------|----------------|
 | Tahap 1: Core Foundation & MVP           | ✅ Selesai     |
-| Tahap 2: Object Detection & Segmentation | ⬜ Belum mulai |
+| Tahap 2: Object Detection & Segmentation | 🏃 In Progress |
 | Tahap 3: Tabular & OCR                   | ⬜ Belum mulai |
 | Tahap 4: Plugin SDK Terbuka              | ⬜ Belum mulai |
 | Tahap 5: Produksi & WebGPU               | ⬜ Belum mulai |
@@ -125,15 +125,53 @@ Commit: `344572f`
 
 ---
 
-## 8. Next Steps — Object Detection Plugin & Platform Stabilization
+## 8. Object Detection Phase 2
+
+### Tahap 2.1 — Types & Constants ✅
+- [x] Tambahkan `ImageTensor`, `ResizeResult`, `LetterboxResult`, `PreprocessResult` ke `types.ts`
+- [x] Tambahkan `DEFAULT_INPUT_SIZE`, `LETTERBOX_COLOR`, `DEFAULT_MEAN`, `DEFAULT_STD` ke `constants.ts`
+- [x] Verifikasi build & typecheck sukses
+
+### Tahap 2.2 — Image Decoder ✅
+- [x] Implementasikan `fileToImageData` di `src/preprocess/image_data.ts`
+- [x] Tambahkan unit test `image_data.test.ts`
+- [x] Verifikasi test pass sukses
+
+### Tahap 2.3 — Resize Module ✅
+- [x] Implementasikan `resizeImage` di `src/preprocess/resize.ts`
+- [x] Tambahkan unit test `resize.test.ts`
+- [x] Verifikasi test pass sukses
+
+### Tahap 2.4 — Letterbox Module ✅
+- [x] Implementasikan `letterboxImage` di `src/preprocess/letterbox.ts`
+- [x] Tambahkan unit test `letterbox.test.ts`
+- [x] Verifikasi test pass sukses
+
+### Tahap 2.5 — Normalization ✅
+- [x] Implementasikan `normalizePixels` di `src/preprocess/normalize.ts`
+- [x] Tambahkan unit test `normalize.test.ts`
+- [x] Verifikasi test pass sukses
+
+### Tahap 2.6 — Tensor Conversion ✅
+- [x] Implementasikan `toCHWTensor` di `src/preprocess/tensor.ts`
+- [x] Tambahkan unit test `tensor.test.ts`
+- [x] Verifikasi test pass sukses
+
+### Tahap 2.7 — Plugin Integration ✅
+- [x] Integrasikan seluruh helper di `src/plugin.ts`
+- [x] Tambahkan unit test `plugin.test.ts` untuk memverifikasi pipeline preprocess secara utuh
+- [x] Verifikasi test pass sukses
+
+---
+
+## 9. Next Steps
 
 Urutan logis berikutnya:
 
-1. **Object Detection Plugin (Phase 2 & 3)**:
-   - Implementasi full preprocess pipeline (letterboxing, normalization, resize)
-   - Integrasi ONNX inference & decoder output model YOLO/SSD
-2. **Object Detection Plugin (Phase 4, 5, 6, & 7)**:
+1. **Object Detection Plugin (Phase 3 & 4)**:
+   - Integrasi ONNX Runtime untuk inference
    - Non-Maximum Suppression (NMS) & IoU postprocessing
+2. **Object Detection Plugin (Phase 5, 6, & 7)**:
    - Visualisasi bounding box dengan canvas overlay
    - custom labels (.txt / .json) & universal model package (.zip)
 3. **Stabilization**:
@@ -141,8 +179,60 @@ Urutan logis berikutnya:
    - Unit test pertama (Vitest) — `validateModelFile()` dan `PluginManager` di `packages/core`
 4. **IndexedDB (Dexie.js)** — histori inferensi di `web-client/src/db/`
 
+
+---
+
+## Workspace Stabilization
+
+### Tahap 1 — Readonly Array Fix ✅
+- [x] Fix readonly array compatibility (`readonly InputType[]`, `readonly ModelFormat[]`).
+- [x] Fix `web-client` RunButton state logic bug (TS2367).
+- Verification: `pnpm build` ✅ — 4/4 tasks successful
+
+### Tahap 2 — Typecheck Workspace ✅
+- [x] Add root `typecheck` script ke `package.json`.
+- [x] Tambah `"typecheck": "turbo run typecheck"` pipeline di `turbo.json`.
+- [x] Add `typecheck` script ke `packages/core`.
+- [x] Add `typecheck` script ke `packages/inference-engine`.
+- [x] Add `typecheck` script ke `packages/plugins/image-classification`.
+- [x] Add `typecheck` script ke `apps/web-client`.
+- Verification: `pnpm typecheck` ✅ — 4/4 packages passed (4.195s)
+
+### Tahap 3 — Integrasi Vitest ✅
+- [x] Buat `packages/core/src/utils/validation.test.ts` (9 test cases).
+- [x] Tambah `vitest` sebagai devDependency di `packages/core`.
+- [x] Update script `test` di `packages/core` menjadi `vitest run`.
+- Verification: `pnpm test` ✅ — 9/9 tests passed (`validation.test.ts`)
+
+### Verification — Full Workspace Health Check ✅
+| Command         | Status | Detail                          |
+|-----------------|--------|---------------------------------|
+| pnpm install    | ✅     | Done in 13.6s                   |
+| pnpm build      | ✅     | 4/4 packages, 8.667s            |
+| pnpm typecheck  | ✅     | 4/4 packages, 4.592s            |
+| pnpm test       | ✅     | 9/9 tests passed, FULL TURBO    |
+
+### Technical Notes
+- Plugin contract migrated to immutable arrays.
+- Workspace sekarang mendukung full type checking via Turborepo pipeline.
+- `typecheck` task dikonfigurasi dengan `dependsOn: ["^typecheck"]` agar dependensi dicheck terlebih dahulu.
+
+### Tahap 4 — CI GitHub Actions ✅
+- [x] Buat `.github/workflows/ci.yml`.
+- [x] Pipeline: `checkout → install pnpm 11.8.0 → setup Node 20 → install → build → typecheck → test`.
+- [x] Trigger: `push` dan `pull_request` ke branch `main`.
+- [x] `concurrency` group dikonfigurasi untuk cancel duplicate runs.
+- [x] `--frozen-lockfile` dipakai pada install untuk memastikan lockfile tidak berubah di CI.
+- Verification: File YAML valid (50 baris), tidak masuk `.gitignore` ✅
+
+### Technical Notes
+- `pnpm/action-setup@v4` dipilih karena kompatibel dengan `packageManager` field di root `package.json`.
+- `actions/setup-node@v4` dengan `cache: pnpm` mengaktifkan caching dependency berbasis `pnpm-lock.yaml` agar CI lebih cepat pada run berikutnya.
+- `concurrency.cancel-in-progress: true` mencegah antrian build menumpuk saat developer melakukan push cepat.
+- `--frozen-lockfile` memproteksi CI dari drift antara `pnpm-lock.yaml` dan `package.json` yang tidak tersinkronisasi.
+
 ---
 
 ## Referensi
 - Dokumen acuan: `universal_inference_platform_tdd.md`
-- Repo: https://github.com/FahroziAldinata/InFera-universal-inference-platform
+- Repo: https://github.com/FahroziAldinata/InFera-universal-inference-platform

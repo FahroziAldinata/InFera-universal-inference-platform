@@ -1,4 +1,4 @@
-import type { InputType, ModelFormat } from '@infera/core';
+import type { InputType, ModelFormat, Tensor } from '@infera/core';
 
 export interface BoundingBox {
     x: number;      // x coordinate (top-left or normalized depending on use-case, typically normalized [0, 1])
@@ -43,3 +43,37 @@ export interface ObjectDetectionConfig {
     iouThreshold: number;
     normalize: boolean;
 }
+
+export interface ImageTensor {
+    data: Float32Array;
+    width: number;
+    height: number;
+    channels: number;
+}
+
+export interface ResizeResult {
+    imageData: ImageData;
+    width: number;
+    height: number;
+}
+
+export interface LetterboxResult {
+    imageData: ImageData;
+    scale: number;
+    padX: number;
+    padY: number;
+}
+
+export interface PreprocessResult extends Tensor {
+    data: Float32Array;
+    dims: number[];
+    type: 'float32';
+    inputWidth: number;
+    inputHeight: number;
+    originalWidth: number;
+    originalHeight: number;
+    scale: number;
+    padX: number;
+    padY: number;
+}
+

@@ -1,34 +1,49 @@
-export interface LetterboxInfo {
-    scale: number;
-    padX: number;
-    padY: number;
-}
+import type { LetterboxResult } from '../types';
+import { LETTERBOX_COLOR } from '../constants';
 
 /**
- * Resize image keeping aspect ratio (letterboxing with black bars)
+ * Resizes an ImageData object maintaining aspect ratio, padding the rest with a specific color
  */
-export async function letterboxImage(
-    input: HTMLImageElement | ImageBitmap,
+export function letterboxImage(
+    imageData: ImageData,
     targetWidth: number,
     targetHeight: number
-): Promise<{ imageData: ImageData; info: LetterboxInfo }> {
-    const canvas = new OffscreenCanvas(targetWidth, targetHeight);
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        throw new Error('Canvas 2D context is not available');
-    }
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, targetWidth, targetHeight);
-    
-    const srcW = input.width;
-    const srcH = input.height;
+): LetterboxResult {
+    const srcW = imageData.width;
+    const srcH = imageData.height;
+
     const scale = Math.min(targetWidth / srcW, targetHeight / srcH);
     const newW = srcW * scale;
     const newH = srcH * scale;
     const padX = (targetWidth - newW) / 2;
     const padY = (targetHeight - newH) / 2;
 
-    ctx.drawImage(input, padX, padY, newW, newH);
-    const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
-    return { imageData, info: { scale, padX, padY } };
+    const srcCanvas = new OffscreenCanvas(srcW, srcH);
+    const srcCtx = srcCanvas.getContext('2d');
+    if (!srcCtx) {
+        throw new Error('Could not get source OffscreenCanvas 2D context');
+    }
+    srcCtx.putImageData(imageData, 0, 0);
+
+    const destCanvas = new OffscreenCanvas(targetWidth, targetHeight);
+    const destCtx = destCanvas.getContext('2d');
+    if (!destCtx) {
+        throw new Error('Could not get destination OffscreenCanvas 2D context');
+    }
+
+    // Fill with padding color (standard [114, 114, 114])
+    const [r, g, b] = LETTERBOX_COLOR;
+    destCtx.fillStyle = `rgb(${r},${g},${b})`;
+    destCtx.fillRect(0, 0, targetWidth, targetHeight);
+
+    // Draw scaled image centered
+    destCtx.drawImage(srcCanvas, padX, padY, newW, newH);
+    const letterboxedData = destCtx.getImageData(0, 0, targetWidth, targetHeight);
+
+    return {
+        imageData: letterboxedData,
+        scale,
+        padX,
+        padY,
+    };
 }
