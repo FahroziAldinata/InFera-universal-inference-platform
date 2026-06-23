@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@infera/inference-engine": "workspace:*",
+    "@infera/plugin-image-classification": "workspace:*",
     "dexie": "^4.4.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
