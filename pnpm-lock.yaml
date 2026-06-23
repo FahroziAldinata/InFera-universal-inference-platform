@@ -328,6 +328,16 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
+  packages/plugins/object-detection:
+    dependencies:
+      '@infera/core':
+        specifier: workspace:*
+        version: link:../../core
+    devDependencies:
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
 packages:
 
   '@babel/code-frame@7.29.7':

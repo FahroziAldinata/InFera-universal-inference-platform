@@ -109,19 +109,40 @@ Commit: `344572f`
 
 ---
 
-## 7. Next Steps — Tahap 2
+## 7. `packages/plugins/object-detection` (Phase 1 — Infrastructure) ✅
+
+- [x] `package.json` — Konfigurasi package `@infera/plugin-object-detection`
+- [x] `tsconfig.json` — Konfigurasi compiler tsconfig
+- [x] `src/types.ts` — Interface `BoundingBox`, `Detection`, `DetectionResult`, `PluginCapabilities`, `DetectionModelMetadata`, dan `ObjectDetectionConfig`
+- [x] `src/constants.ts` — `DEFAULT_CONFIG` dan `DEFAULT_CAPABILITIES`
+- [x] `src/metadata.ts` — Helper `getModelMetadata()` untuk dinamisasi model adapter
+- [x] `src/preprocess/` — Helper skeleton: `resize.ts`, `normalize.ts`, `letterbox.ts`
+- [x] `src/postprocess/` — Helper skeleton: `nms.ts`, `iou.ts`, `decoder.ts`
+- [x] `src/utils/` — Helper skeleton: `canvas.ts`, `colors.ts`
+- [x] `src/plugin.ts` — Skeleton `ObjectDetectionPlugin` implements `InferencePlugin<DetectionResult>`
+- [x] `src/index.ts` — Entrypoint re-exports
+- [x] Build & Typecheck: `pnpm build` & `pnpm typecheck` sukses ✅
+
+---
+
+## 8. Next Steps — Object Detection Plugin & Platform Stabilization
 
 Urutan logis berikutnya:
 
-1. **Fix `@infera/core` alias** di `packages/inference-engine` — hapus workaround relative import
-2. **Unit test pertama (Vitest)** — `validateModelFile()` dan `PluginManager` di `packages/core`
-3. **`packages/plugins/object-detection`** — plugin baru untuk YOLO dan model deteksi objek:
-   - `postprocess()` dengan Non-Max Suppression (NMS)
-   - Visualisasi bounding box di atas gambar via Canvas
+1. **Object Detection Plugin (Phase 2 & 3)**:
+   - Implementasi full preprocess pipeline (letterboxing, normalization, resize)
+   - Integrasi ONNX inference & decoder output model YOLO/SSD
+2. **Object Detection Plugin (Phase 4, 5, 6, & 7)**:
+   - Non-Maximum Suppression (NMS) & IoU postprocessing
+   - Visualisasi bounding box dengan canvas overlay
+   - custom labels (.txt / .json) & universal model package (.zip)
+3. **Stabilization**:
+   - Fix `@infera/core` alias di `packages/inference-engine` — hapus workaround relative import
+   - Unit test pertama (Vitest) — `validateModelFile()` dan `PluginManager` di `packages/core`
 4. **IndexedDB (Dexie.js)** — histori inferensi di `web-client/src/db/`
 
 ---
 
 ## Referensi
 - Dokumen acuan: `universal_inference_platform_tdd.md`
-- Repo: https://github.com/FahroziAldinata/InFera-universal-inference-platform
+- Repo: https://github.com/FahroziAldinata/InFera-universal-inference-platform

@@ -7,3 +7,4 @@ dist/
 *.log
 .env
 .DS_Store
+verify-image-classification.ps1
