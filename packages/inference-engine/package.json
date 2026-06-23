@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "echo \"no lint configured yet\"",
+    "typecheck": "tsc --noEmit",
     "test": "echo \"no test configured yet\""
   },
   "keywords": [],

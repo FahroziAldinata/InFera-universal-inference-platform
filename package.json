@@ -8,6 +8,7 @@
     "test": "pnpm exec turbo run test",
     "lint": "pnpm exec turbo run lint",
     "build": "pnpm exec turbo run build",
+    "typecheck": "pnpm exec turbo run typecheck",
     "dev": "pnpm exec turbo run dev"
   },
   "keywords": [],

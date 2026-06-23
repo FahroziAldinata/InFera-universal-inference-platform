@@ -31,8 +31,8 @@ export interface InferencePlugin<TResult = unknown> {
     id: string;
     name: string;
     version: string;
-    supportedInputTypes: InputType[];
-    supportedModelFormats: ModelFormat[];
+    supportedInputTypes: readonly InputType[];
+    supportedModelFormats: readonly ModelFormat[];
 
     init(): Promise<void>;
     preprocess(input: unknown): Promise<Tensor>;

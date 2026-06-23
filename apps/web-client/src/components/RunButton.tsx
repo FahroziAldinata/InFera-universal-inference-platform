@@ -12,7 +12,7 @@ export function RunButton() {
     setError,
   } = useInferenceStore();
 
-  const canRun = step === 'image-ready' || step === 'done';
+  const canRun = step === 'image-ready' || step === 'done' || step === 'running';
 
   async function handleRun() {
     if (!modelInfo || !imageFile) return;
