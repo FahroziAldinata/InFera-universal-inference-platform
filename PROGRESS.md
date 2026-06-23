@@ -179,10 +179,10 @@ Commit: `344572f`
 - [x] Tambahkan unit test `session.test.ts`
 - [x] Verifikasi build, typecheck, dan test sukses
 
-#### Tahap 3.3 — Inference Engine
-- [ ] Buat `src/runtime/inference.ts`
-- [ ] Tambahkan unit test `inference.test.ts`
-- [ ] Verifikasi build, typecheck, dan test sukses
+#### Tahap 3.3 — Inference Engine ✅
+- [x] Buat `src/runtime/inference.ts` with `runInference` returning multi-output record
+- [x] Tambahkan unit test `inference.test.ts` using mocked InferenceSession
+- [x] Verifikasi build, typecheck, dan test sukses
 
 #### Tahap 3.4 — Plugin Integration
 - [ ] Integrasikan runtime di `src/plugin.ts`
