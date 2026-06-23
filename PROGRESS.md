@@ -225,9 +225,10 @@ Commit: `344572f`
 - [x] Buat `src/visualization/types.ts` dengan interface `DrawOptions` dan `DrawStatistics`
 - [x] Verifikasi build & typecheck sukses
 
-### Tahap 5.2 — Color System
-- [ ] Implementasikan `src/visualization/colors.ts` & HSL generator
-- [ ] Verifikasi build & tests sukses
+### Tahap 5.2 — Color System ✅
+- [x] Implementasikan `src/visualization/colors.ts` dengan default palette dan deterministic HSL generator
+- [x] Tambahkan unit test `colors.test.ts` untuk verifikasi determinisme dan overflow palette
+- [x] Verifikasi build, typecheck, dan test sukses (105 tests pass)
 
 ### Tahap 5.3 — Bounding Box Drawing
 - [ ] Implementasikan `src/visualization/draw_boxes.ts`
