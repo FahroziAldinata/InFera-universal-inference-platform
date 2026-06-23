@@ -189,31 +189,73 @@ Commit: `344572f`
 - [x] Tambahkan unit test untuk integrasi plugin lifecycle di `plugin.test.ts`
 - [x] Verifikasi build, typecheck, dan test sukses
 
-### Object Detection Phase 4
+### Object Detection Phase 4 ✅
 
-#### Tahap 4.1 — Decoder
-- [ ] Buat `src/postprocess/decoder.ts`, `yolov5_decoder.ts`, `yolov8_decoder.ts`
-- [ ] Verifikasi build, typecheck, dan test sukses
+#### Tahap 4.1 — Decoder ✅
+- [x] Buat `src/postprocess/yolov5_decoder.ts` — decode output [1, N, 5+C] (row-major, objectness × class conf)
+- [x] Buat `src/postprocess/yolov8_decoder.ts` — decode output [1, 4+C, N] (column-major, direct class conf)
+- [x] Refactor `src/postprocess/decoder.ts` → dispatcher `decodeYOLO()` dengan auto-detect arsitektur via shape
+- [x] Tambahkan unit test `decoder.test.ts` (7 test cases)
+- [x] Verifikasi build, typecheck, dan test sukses
 
-#### Tahap 4.2 — Coordinate Restoration
-- [ ] Buat `src/postprocess/restore.ts` & `restore.test.ts`
-- [ ] Verifikasi build, typecheck, dan test sukses
+#### Tahap 4.2 — Coordinate Restoration ✅
+- [x] Buat `src/postprocess/restore_boxes.ts` — `restoreBoxes()` mengonversi model-space → original image-space
+- [x] Tambahkan unit test `restore_boxes.test.ts` (4 test cases: no-padding, letterbox undo, clamping, field preservation)
+- [x] Verifikasi build, typecheck, dan test sukses
 
-#### Tahap 4.3 — IoU
-- [ ] Buat `src/postprocess/iou.ts` & `iou.test.ts`
-- [ ] Verifikasi build, typecheck, dan test sukses
+#### Tahap 4.3 — IoU ✅
+- [x] `src/postprocess/iou.ts` sudah ada dari Phase 1 skeleton
+- [x] Tambahkan unit test `iou.test.ts` (5 test cases: identical, non-overlapping, adjacent, partial overlap, contained)
+- [x] Verifikasi build, typecheck, dan test sukses
 
-#### Tahap 4.4 — Non-Max Suppression (NMS)
-- [ ] Buat `src/postprocess/nms.ts` & `nms.test.ts`
-- [ ] Verifikasi build, typecheck, dan test sukses
+#### Tahap 4.4 — Non-Max Suppression (NMS) ✅
+- [x] Upgrade `src/postprocess/nms.ts` — tambah `NMSOptions` (`classAgnostic`, `maxDetections`)
+- [x] Tambahkan unit test `nms.test.ts` (6 test cases: suppression, non-overlap, class-aware, class-agnostic, maxDetections, empty)
+- [x] Verifikasi build, typecheck, dan test sukses
 
-#### Tahap 4.5 — Pipeline Test
-- [ ] Buat `src/__tests__/pipeline.test.ts`
-- [ ] Verifikasi build, typecheck, dan test sukses
+#### Tahap 4.5 — Pipeline Integration ✅
+- [x] Implementasikan `postprocess()` di `plugin.ts` (decode → restoreBoxes → NMS)
+- [x] Buat `src/__tests__/pipeline.test.ts` (4 end-to-end test cases: happy path, empty, NMS dedup, letterbox restore)
+- [x] Verifikasi build, typecheck, dan test sukses (**100 tests pass, 26 test files**)
+---
+
+## 10. Object Detection Phase 5 (Canvas Overlay Visualization) 🏃
+
+### Tahap 5.1 — Visualization Foundation ✅
+- [x] Buat `src/visualization/types.ts` dengan interface `DrawOptions` dan `DrawStatistics`
+- [x] Verifikasi build & typecheck sukses
+
+### Tahap 5.2 — Color System
+- [ ] Implementasikan `src/visualization/colors.ts` & HSL generator
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 5.3 — Bounding Box Drawing
+- [ ] Implementasikan `src/visualization/draw_boxes.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 5.4 — Label Rendering
+- [ ] Implementasikan `src/visualization/draw_labels.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 5.5 — Canvas Rendering Engine
+- [ ] Implementasikan `drawDetections` returning `DrawStatistics`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 5.6 — Support Retina Display
+- [ ] Dynamic device pixel ratio scaling
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 5.7 — Export Helper
+- [ ] Implementasikan `src/visualization/export_canvas.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 5.8 — Integration
+- [ ] Integrasikan & export all modules
+- [ ] Verifikasi build & tests sukses
 
 ---
 
-## 10. Next Steps
+## 11. Next Steps
 
 Urutan logis berikutnya:
 
