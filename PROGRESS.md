@@ -274,9 +274,8 @@ Commit: `344572f`
 ### Tahap 6.5 — Labels Parser ✅
 - [x] Implementasikan `src/model-package/labels_parser.ts` dengan dukungan parsing `labels.txt`, `labels.json` array, dan `labels.json` map dengan numeric index sorting
 
-### Tahap 6.6 — Package Loader
-- [ ] Implementasikan `src/model-package/package_loader.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 6.6 — Package Loader ✅
+- [x] Implementasikan `src/model-package/package_loader.ts` untuk mengorkestrasi unzip, validate, metadata parsing, labels parsing, dan pemetaan thumbnail/readme dalam spesifikasi UAMP
 
 ### Tahap 6.7 — Security ✅
 - [x] Validasi Zip Slip (path traversal check), Zip Bomb (100MB limit check), dan Max Entries (1000 file limit check) terintegrasi langsung pada `unzipArchive()`
