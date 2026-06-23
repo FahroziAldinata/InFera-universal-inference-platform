@@ -10,7 +10,7 @@ Terakhir diperbarui: **23 Juni 2026**
 
 | Tahap (sesuai Roadmap TDD)              | Status         |
 |------------------------------------------|----------------|
-| Tahap 1: Core Foundation & MVP           | 🔄 In Progress |
+| Tahap 1: Core Foundation & MVP           | ✅ Selesai     |
 | Tahap 2: Object Detection & Segmentation | ⬜ Belum mulai |
 | Tahap 3: Tabular & OCR                   | ⬜ Belum mulai |
 | Tahap 4: Plugin SDK Terbuka              | ⬜ Belum mulai |
@@ -20,123 +20,105 @@ Terakhir diperbarui: **23 Juni 2026**
 
 ## 1. Infrastruktur Project ✅
 
-- [x] Repo GitHub dibuat: `FahroziAldinata/InFera-universal-inference-platform`
-- [x] Node.js v24.17.0 + npm 11.13.0 terinstall
-- [x] pnpm v11.8.0 terinstall sebagai package manager
-- [x] Monorepo di-setup dengan **Turborepo** (`turbo.json`)
-- [x] `pnpm-workspace.yaml` dikonfigurasi (`apps/*`, `packages/*`, `packages/plugins/*`)
-- [x] `.gitignore` dikonfigurasi (exclude `node_modules`, `dist`, `.turbo`, dll)
-- [x] Branch utama disamakan jadi `main`, ter-push ke GitHub
+- [x] Repo GitHub: `FahroziAldinata/InFera-universal-inference-platform`
+- [x] Node.js v24.17.0 + npm 11.13.0
+- [x] pnpm v11.8.0 sebagai package manager
+- [x] Monorepo Turborepo (`turbo.json`)
+- [x] `pnpm-workspace.yaml` (`apps/*`, `packages/*`, `packages/plugins/*`)
+- [x] `.gitignore` dikonfigurasi
+- [x] Branch utama `main`
 
-**Struktur folder saat ini:**
+**Struktur folder:**
 ```
 Infera/
 ├── apps/
-│   └── web-client/          ✅ React + Vite + TypeScript (scaffold awal)
+│   └── web-client/          ✅ React + Vite + TypeScript (MVP selesai)
 ├── packages/
-│   ├── core/                ✅ Selesai (lihat detail di bawah)
-│   ├── inference-engine/    ✅ Selesai (lihat detail di bawah)
+│   ├── core/                ✅ Selesai
+│   ├── inference-engine/    ✅ Selesai
 │   └── plugins/
-│       └── image-classification/   ⬜ Belum diisi
-├── package.json              ✅ Root, dengan script lint/test/build/dev via turbo
-├── turbo.json                ✅
-├── pnpm-workspace.yaml        ✅
-└── .gitignore                 ✅
+│       └── image-classification/   ✅ Selesai
+├── package.json
+├── turbo.json
+├── pnpm-workspace.yaml
+└── .gitignore
 ```
 
 ---
 
-## 2. `packages/core` ✅ Selesai
+## 2. `packages/core` ✅
 
-Berisi kontrak/interface inti platform sesuai TDD bagian 7 (Desain Plugin).
-
-**File yang sudah dibuat:**
-- `src/types/plugin.ts`
-  - `Tensor` — representasi tensor universal antar plugin & engine
-  - `ModelFormat`, `InputType` — tipe-tipe dasar
-  - `InferenceResult<T>` — hasil generik dari inferensi
-  - `ModelMetadata` — metadata model yang diupload
-  - `InferencePlugin<T>` — **interface utama** yang wajib diimplementasikan tiap plugin task (init, preprocess, postprocess, dispose)
-  - `PluginRegistration` — status registrasi plugin
-- `src/utils/validation.ts`
-  - `validateModelFile()` — validasi ukuran (maks 500MB) & ekstensi file model, sesuai TDD bagian 13 (Security Consideration — DoS prevention)
-  - `sanitizeOutputText()` — sanitasi teks output model untuk mencegah XSS (relevan untuk plugin OCR nanti)
-- `src/plugin-manager.ts`
-  - Class `PluginManager` — register/unregister plugin, enable/disable, list plugin aktif
-  - `pluginManager` — singleton instance
-- `src/index.ts` — entry point export semua di atas
-
-**Status build:** `pnpm exec tsc -b` ✅ lolos tanpa error.
+- `src/types/plugin.ts` — `Tensor`, `ModelFormat`, `InputType`, `InferenceResult<T>`, `ModelMetadata`, `InferencePlugin<T>`, `PluginRegistration`
+- `src/utils/validation.ts` — `validateModelFile()`, `sanitizeOutputText()`
+- `src/plugin-manager.ts` — `PluginManager` singleton
+- Build: `pnpm exec tsc -b` ✅
 
 ---
 
-## 3. `packages/inference-engine` ✅ Selesai (untuk ONNX)
+## 3. `packages/inference-engine` ✅
 
-Implementasi Engine API sesuai TDD bagian 11 (API Design), khusus runtime ONNX terlebih dahulu.
+- `OnnxRunner` — `loadModel()`, `warmup()`, `run()`, `dispose()`
+- Singleton `onnxRunner`
+- Backend: WASM (WebGL/WebGPU di Tahap 5)
+- Build: `pnpm exec tsc --noEmit` ✅
 
-**File yang sudah dibuat:**
-- `src/onnx-runner.ts`
-  - Class `OnnxRunner` — wrapper di atas `onnxruntime-web`
-    - `loadModel(file)` → load `.onnx`, kembalikan session ID unik
-    - `warmup(modelId, inputShape)` → dummy inference untuk mencegah lag shader pertama kali
-    - `run(modelId, inputTensor)` → eksekusi inferensi sesungguhnya
-    - `dispose(modelId)` → release session, cegah memory leak (poin kritik Senior Engineer di TDD 16.1)
-  - `onnxRunner` — singleton instance
-- `src/index.ts` — entry point export
-
-**Catatan teknis:**
-- Sempat ada kendala resolusi module `@infera/core` lewat workspace alias (`Cannot find module`). **Solusi sementara**: `onnx-runner.ts` mengimpor tipe `Tensor` via path relatif langsung (`../../core/src/types/plugin`) alih-alih nama package `@infera/core`. Ini berfungsi, namun **perlu dirapikan kembali di kemudian hari** agar konsisten memakai package alias (kemungkinan perlu konfigurasi `tsup`/`tsc -b` yang lebih matang atau pindah ke bundler seperti `vite-plugin-dts`).
-- Saat ini baru mendukung **executionProvider: `wasm`**. Dukungan `webgl`/`webgpu` (TDD Tahap 5) belum diimplementasikan.
-
-**Status build:** `pnpm exec tsc --noEmit` ✅ lolos tanpa error.
+**Catatan teknis (tech debt):**
+- Import `Tensor` masih via path relatif, bukan `@infera/core` alias — perlu dirapikan di Tahap 2.
 
 ---
 
-## 4. `apps/web-client` 🔄 Baru Scaffold
+## 4. `packages/plugins/image-classification` ✅
 
-- [x] Scaffold awal via `pnpm create vite@latest -- --template react-ts`
-- [x] Dependency terinstall: `zustand`, `dexie`, `tailwindcss`, `postcss`, `autoprefixer`
-- [ ] Konfigurasi Tailwind belum dirapikan/diverifikasi jalan
-- [ ] Belum ada komponen UI (uploader, layout, dsb.)
-- [ ] Belum terhubung ke `packages/core` & `packages/inference-engine`
+Commit: `abd423c`
 
----
-
-## 5. Tooling: Lint & Test ✅ Selesai
-
-- [x] ESLint (`eslint.config.js`, flat config) + `@typescript-eslint`
-- [x] Prettier (`.prettierrc`)
-- [x] Vitest terinstall di root (belum ada test case ditulis)
-- [x] Script terpusat di root `package.json`:
-  ```json
-  "scripts": {
-    "test": "pnpm exec turbo run test",
-    "lint": "pnpm exec turbo run lint",
-    "build": "pnpm exec turbo run build",
-    "dev": "pnpm exec turbo run dev"
-  }
-  ```
-- [x] `pnpm run lint` berhasil dijalankan di semua workspace (`@infera/core`, `@infera/inference-engine`, `web-client`)
-- [ ] Belum ada unit test sungguhan (baru placeholder `echo "no test configured yet"`)
+- `src/types.ts` — `ClassificationLabel`, `ClassificationResult`, `ImageClassificationConfig`, `DEFAULT_CONFIG`
+- `src/plugin.ts` — `ImageClassificationPlugin`:
+  - `setInputShape()` — baca shape dari model, tidak hardcode 224×224
+  - `loadLabels()` — parse file `.txt` label
+  - `preprocess()` — resize via `OffscreenCanvas`, RGBA → NCHW Float32Array, normalisasi
+  - `postprocess()` — softmax dengan max-subtraction, sort topK, map ke label, fallback `Class N`
+  - `init()`, `dispose()`
+  - Singleton `imageClassificationPlugin`
+- Verified: **56/56 OK** via PowerShell script
 
 ---
 
-## 6. Belum Dikerjakan (Next Steps)
+## 5. `apps/web-client` ✅ MVP Selesai
 
-Urutan logis berikutnya, masih dalam **Tahap 1 (MVP)** sesuai roadmap TDD:
+Commit: `344572f`
 
-1. **`packages/plugins/image-classification`** — implementasi `InferencePlugin` pertama:
-   - `preprocess()` — resize gambar ke ukuran input model (misal 224x224), normalisasi RGB
-   - `postprocess()` — ubah output tensor jadi daftar label + confidence score
-   - `renderInputConfig()` / `renderResultVisualization()` — komponen React sederhana
-2. **Hubungkan `web-client` ⇄ `core` ⇄ `inference-engine`**:
-   - Komponen uploader model (`.onnx`) & label (`.txt`)
-   - Komponen uploader gambar input
-   - Tombol "Jalankan Inferensi" yang memanggil `pluginManager` + `onnxRunner`
-   - Tampilkan hasil confidence score di UI
-3. **Rapikan resolusi module `@infera/core`** (lihat catatan teknis di atas) agar tidak lagi pakai workaround relative import.
-4. Tulis unit test pertama (Vitest) untuk `validateModelFile()` dan `PluginManager` di `packages/core`.
-5. Setup IndexedDB (Dexie.js) di `web-client/src/db/` untuk histori inferensi (boleh ditunda ke Tahap 3 sesuai roadmap, tapi skema dasar bisa disiapkan lebih awal).
+**Komponen:**
+- `src/store/inferenceStore.ts` — Zustand store: `AppStep`, `ModelInfo`, seluruh pipeline state
+- `src/components/ModelUploader.tsx` — upload `.onnx` + `.txt`, muat model, notifikasi sukses dengan metadata (nama, jumlah label, input shape)
+- `src/components/ImageUploader.tsx` — upload gambar dengan preview, aktif setelah model dimuat
+- `src/components/RunButton.tsx` — pipeline `preprocess → run → postprocess`, aktif setelah gambar dipilih
+- `src/components/ResultPanel.tsx` — topK label + confidence bar + execution time + error state
+
+**Verified end-to-end:**
+- Model: `mobilenetv2-10.onnx` (1000 label ImageNet)
+- Hasil: top prediction `banded gecko 99.82%`, execution time `0.7ms` ✅
+
+---
+
+## 6. Tooling ✅
+
+- ESLint flat config + `@typescript-eslint`
+- Prettier
+- Vitest terinstall (belum ada test case)
+- Script terpusat di root `package.json`
+
+---
+
+## 7. Next Steps — Tahap 2
+
+Urutan logis berikutnya:
+
+1. **Fix `@infera/core` alias** di `packages/inference-engine` — hapus workaround relative import
+2. **Unit test pertama (Vitest)** — `validateModelFile()` dan `PluginManager` di `packages/core`
+3. **`packages/plugins/object-detection`** — plugin baru untuk YOLO dan model deteksi objek:
+   - `postprocess()` dengan Non-Max Suppression (NMS)
+   - Visualisasi bounding box di atas gambar via Canvas
+4. **IndexedDB (Dexie.js)** — histori inferensi di `web-client/src/db/`
 
 ---
 
