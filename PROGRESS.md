@@ -174,10 +174,10 @@ Commit: `344572f`
 - [x] Refactor `src/types.ts` dan `src/metadata.ts`
 - [x] Verifikasi build & typecheck sukses
 
-#### Tahap 3.2 — Session Manager
-- [ ] Buat `src/runtime/session.ts`
-- [ ] Tambahkan unit test `session.test.ts`
-- [ ] Verifikasi build, typecheck, dan test sukses
+#### Tahap 3.2 — Session Manager ✅
+- [x] Buat `src/runtime/session.ts` with `loadModel`, `createSession`, `disposeSession`, and `getSessionInfo`
+- [x] Tambahkan unit test `session.test.ts`
+- [x] Verifikasi build, typecheck, dan test sukses
 
 #### Tahap 3.3 — Inference Engine
 - [ ] Buat `src/runtime/inference.ts`

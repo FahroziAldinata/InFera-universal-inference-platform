@@ -17,7 +17,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@infera/core": "workspace:*"
+    "@infera/core": "workspace:*",
+    "onnxruntime-web": "^1.27.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0"
