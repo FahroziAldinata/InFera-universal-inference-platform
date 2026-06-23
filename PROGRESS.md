@@ -285,10 +285,38 @@ Commit: `344572f`
 - [x] Export `loadPackage` dan type UAMP di `src/index.ts`
 - [x] Tambahkan unit test `package_loader.test.ts` (14 test cases) mencakup model loading valid, labels format text/json/map, fallback labels, nested/corrupt zip, zip slip protection, zip bomb limits, dan non-UTF8 validation
 - [x] Verifikasi build, typecheck, dan test sukses (**180 tests pass, 36 test files**)
+---
+
+## 12. Object Detection Phase 7 (WebGPU Backend & Runtime Benchmarking) 跑
+
+### Tahap 7.1 — Runtime Capability Detection ✅
+- [x] Implementasikan `src/runtime/capability.ts` dengan `detectBestBackend()` berbasis `navigator.gpu` dan fallback `wasm`
+- [x] Tambahkan unit test `capability.test.ts` (4 test cases) untuk memverifikasi behavior deteksi backend pada berbagai variasi browser mockup environment
+- [x] Verifikasi build & typecheck sukses
+
+### Tahap 7.2 — Session Backend Fallback
+- [ ] Implementasikan backend fallback di `src/runtime/session.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 7.3 — Benchmark & Metrics
+- [ ] Implementasikan `src/runtime/benchmark.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 7.4 — Plugin Integration
+- [ ] Integrasikan preferredBackend & benchmark di `src/plugin.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 7.5 — Comprehensive Tests
+- [ ] Tambahkan unit & integration tests untuk metrics dan fallback
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 7.6 — Documentation
+- [ ] Update README.md & dokumentasi final
+- [ ] Verifikasi build & tests sukses
 
 ---
 
-## 12. Next Steps
+## 13. Next Steps
 
 Urutan logis berikutnya:
 
