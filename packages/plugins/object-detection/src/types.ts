@@ -29,12 +29,8 @@ export interface PluginCapabilities {
     supportsCanvasOverlay: boolean;
 }
 
-export interface DetectionModelMetadata {
-    architecture: 'yolov5' | 'yolov8' | 'yolo_nas' | 'custom';
-    inputSize: number;
-    classCount: number;
-    outputNames: string[];
-}
+import type { DetectionModelMetadata } from './model_metadata';
+export type { DetectionModelMetadata };
 
 export interface ObjectDetectionConfig {
     inputWidth: number;

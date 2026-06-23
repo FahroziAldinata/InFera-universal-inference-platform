@@ -164,7 +164,55 @@ Commit: `344572f`
 
 ---
 
-## 9. Next Steps
+## 9. Object Detection Phase 3 & 4
+
+### Object Detection Phase 3
+
+#### Tahap 3.1 — Model Metadata ✅
+- [x] Buat `src/model_metadata.ts`
+- [x] Definisikan interface `DetectionModelMetadata` dengan properti optional `architecture`
+- [x] Refactor `src/types.ts` dan `src/metadata.ts`
+- [x] Verifikasi build & typecheck sukses
+
+#### Tahap 3.2 — Session Manager
+- [ ] Buat `src/runtime/session.ts`
+- [ ] Tambahkan unit test `session.test.ts`
+- [ ] Verifikasi build, typecheck, dan test sukses
+
+#### Tahap 3.3 — Inference Engine
+- [ ] Buat `src/runtime/inference.ts`
+- [ ] Tambahkan unit test `inference.test.ts`
+- [ ] Verifikasi build, typecheck, dan test sukses
+
+#### Tahap 3.4 — Plugin Integration
+- [ ] Integrasikan runtime di `src/plugin.ts`
+- [ ] Verifikasi build, typecheck, dan test sukses
+
+### Object Detection Phase 4
+
+#### Tahap 4.1 — Decoder
+- [ ] Buat `src/postprocess/decoder.ts`, `yolov5_decoder.ts`, `yolov8_decoder.ts`
+- [ ] Verifikasi build, typecheck, dan test sukses
+
+#### Tahap 4.2 — Coordinate Restoration
+- [ ] Buat `src/postprocess/restore.ts` & `restore.test.ts`
+- [ ] Verifikasi build, typecheck, dan test sukses
+
+#### Tahap 4.3 — IoU
+- [ ] Buat `src/postprocess/iou.ts` & `iou.test.ts`
+- [ ] Verifikasi build, typecheck, dan test sukses
+
+#### Tahap 4.4 — Non-Max Suppression (NMS)
+- [ ] Buat `src/postprocess/nms.ts` & `nms.test.ts`
+- [ ] Verifikasi build, typecheck, dan test sukses
+
+#### Tahap 4.5 — Pipeline Test
+- [ ] Buat `src/__tests__/pipeline.test.ts`
+- [ ] Verifikasi build, typecheck, dan test sukses
+
+---
+
+## 10. Next Steps
 
 Urutan logis berikutnya:
 

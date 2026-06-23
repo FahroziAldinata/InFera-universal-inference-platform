@@ -1,18 +1,21 @@
-import type { DetectionModelMetadata } from './types';
+import type { DetectionModelMetadata } from './model_metadata';
 
-/**
- * Helper to construct and retrieve model metadata configurations
- */
 export function getModelMetadata(
-    architecture: 'yolov5' | 'yolov8' | 'yolo_nas' | 'custom',
-    inputSize = 640,
-    classCount = 80,
-    outputNames: string[] = []
+    architecture?: 'yolov5' | 'yolov8',
+    inputWidth = 640,
+    inputHeight = 640,
+    classNames: string[] = [],
+    outputNames: string[] = [],
+    confidenceThreshold = 0.25,
+    iouThreshold = 0.45
 ): DetectionModelMetadata {
     return {
         architecture,
-        inputSize,
-        classCount,
+        inputWidth,
+        inputHeight,
+        classNames,
         outputNames,
+        confidenceThreshold,
+        iouThreshold,
     };
 }
