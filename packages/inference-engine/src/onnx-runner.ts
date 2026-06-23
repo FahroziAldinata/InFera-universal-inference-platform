@@ -1,5 +1,5 @@
 import * as ort from 'onnxruntime-web';
-import type { Tensor } from '../../core/src/types/plugin';
+import type { Tensor } from '@infera/core';
 
 /**
  * Merepresentasikan satu sesi model ONNX yang sedang aktif di memori.
