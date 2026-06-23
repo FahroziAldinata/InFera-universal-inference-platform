@@ -294,9 +294,9 @@ Commit: `344572f`
 - [x] Tambahkan unit test `capability.test.ts` (4 test cases) untuk memverifikasi behavior deteksi backend pada berbagai variasi browser mockup environment
 - [x] Verifikasi build & typecheck sukses
 
-### Tahap 7.2 — Session Backend Fallback
-- [ ] Implementasikan backend fallback di `src/runtime/session.ts`
-- [ ] Verifikasi build & tests sukses
+### Tahap 7.2 — Session Backend Fallback ✅
+- [x] Implementasikan `createSessionWithFallback()` di `src/runtime/session.ts` untuk memfasilitasi pembuatan session WebGPU dengan otomatis fallback ke WASM jika inisialisasi gagal
+- [x] Tambahkan unit test di `session.test.ts` (9 test cases) untuk memverifikasi inisialisasi sukses WebGPU, fallback inisialisasi, auto detection, dan execution provider overrides
 
 ### Tahap 7.3 — Benchmark & Metrics
 - [ ] Implementasikan `src/runtime/benchmark.ts`
