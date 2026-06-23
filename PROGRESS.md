@@ -254,10 +254,45 @@ Commit: `344572f`
 - [x] Export seluruh module baru di `src/index.ts`
 - [x] Tambahkan unit test `draw_detections.test.ts` untuk memverifikasi integration rendering, Retina display, dan ImageData background drawing
 - [x] Verifikasi build, typecheck, dan test sukses (**152 tests pass, 34 test files**)
+---
+
+## 11. Object Detection Phase 6 (Universal Model Package) 🏃
+
+### Tahap 6.1 — Universal Package Types ✅
+- [x] Buat `src/model-package/types.ts` dengan interface `PackageMetadata`, `ParsedModelPackage`, dan `SupportedTask` enums
+- [x] Verifikasi build & typecheck sukses
+
+### Tahap 6.2 — ZIP Loader
+- [ ] Implementasikan `src/model-package/unzip.ts` berbasis `fflate`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 6.3 — Validation
+- [ ] Implementasikan `src/model-package/validate_package.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 6.4 — Metadata Parser
+- [ ] Implementasikan `src/model-package/metadata_parser.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 6.5 — Labels Parser
+- [ ] Implementasikan `src/model-package/labels_parser.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 6.6 — Package Loader
+- [ ] Implementasikan `src/model-package/package_loader.ts`
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 6.7 — Security
+- [ ] Tambahkan validasi Zip Slip, Zip Bomb, dan Max Entries
+- [ ] Verifikasi build & tests sukses
+
+### Tahap 6.8 — Future Compatibility
+- [ ] Tambahkan task enums & support visualizer exports
+- [ ] Verifikasi build & tests sukses
 
 ---
 
-## 11. Next Steps
+## 12. Next Steps
 
 Urutan logis berikutnya:
 
