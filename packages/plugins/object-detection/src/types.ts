@@ -43,6 +43,7 @@ export interface ObjectDetectionConfig {
     normalize: boolean;
     executionProviders?: string[];
     preferredBackend?: 'auto' | 'webgpu' | 'wasm';
+    enableMetrics?: boolean;
 }
 
 export interface ImageTensor {

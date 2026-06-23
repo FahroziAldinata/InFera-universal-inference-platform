@@ -2,8 +2,14 @@
  * Decodes a File, HTMLImageElement, or ImageBitmap into ImageData using OffscreenCanvas
  */
 export async function fileToImageData(
-    input: File | HTMLImageElement | ImageBitmap
+    input: File | HTMLImageElement | ImageBitmap | ImageData
 ): Promise<ImageData> {
+    if (
+        (typeof ImageData !== 'undefined' && input instanceof ImageData) ||
+        (typeof input === 'object' && input !== null && 'width' in input && 'height' in input && 'data' in input && !('close' in input))
+    ) {
+        return input as ImageData;
+    }
     let bitmap: ImageBitmap;
     if (input instanceof File || input instanceof Blob) {
         bitmap = await createImageBitmap(input);

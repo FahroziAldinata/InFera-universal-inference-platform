@@ -42,10 +42,19 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     async loadModel(modelFile: File): Promise<void> {
         console.log(`[${this.id}] Loading model: ${modelFile.name}`);
         const modelData = await loadModelHelper(modelFile);
+        
+        const usePreferred = this.config.preferredBackend === 'auto' || this.config.preferredBackend === 'webgpu';
+        const isDefaultProviders = this.config.executionProviders &&
+            this.config.executionProviders.length === 1 &&
+            this.config.executionProviders[0] === 'wasm';
+        const customProviders = usePreferred && isDefaultProviders
+            ? undefined
+            : this.config.executionProviders;
+
         const { session, backend } = await createSessionWithFallback(
             modelData,
             this.config.preferredBackend || 'auto',
-            this.config.executionProviders
+            customProviders
         );
         this.session = session;
         this.backend = backend;
@@ -87,17 +96,18 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
         const postprocessed = await this.postprocess(primaryOutputTensor);
         const postprocessTimeMs = performance.now() - tPostStart;
 
-        const metrics = calculateMetrics(
+        const useMetrics = this.config.enableMetrics !== false;
+        const metrics = useMetrics ? calculateMetrics(
             preprocessTimeMs,
             inferenceTimeMs,
             postprocessTimeMs,
             this.backend
-        );
+        ) : undefined;
 
         return {
             ...postprocessed,
-            executionTimeMs: metrics.totalTimeMs,
-            metrics
+            executionTimeMs: metrics ? metrics.totalTimeMs : (preprocessTimeMs + inferenceTimeMs + postprocessTimeMs),
+            ...(metrics ? { metrics } : {})
         };
     }
 

@@ -13,6 +13,7 @@ export const DEFAULT_CONFIG: ObjectDetectionConfig = {
     normalize: true,
     executionProviders: ['wasm'],
     preferredBackend: 'auto',
+    enableMetrics: true,
 };
 
 export const DEFAULT_CAPABILITIES: PluginCapabilities = {

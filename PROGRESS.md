@@ -287,7 +287,7 @@ Commit: `344572f`
 - [x] Verifikasi build, typecheck, dan test sukses (**180 tests pass, 36 test files**)
 ---
 
-## 12. Object Detection Phase 7 (WebGPU Backend & Runtime Benchmarking) 跑
+## 12. Object Detection Phase 7 (WebGPU Backend & Runtime Benchmarking) ✅
 
 ### Tahap 7.1 — Runtime Capability Detection ✅
 - [x] Implementasikan `src/runtime/capability.ts` dengan `detectBestBackend()` berbasis `navigator.gpu` dan fallback `wasm`
@@ -304,15 +304,15 @@ Commit: `344572f`
 
 ### Tahap 7.4 — Plugin Integration ✅
 - [x] Integrasikan `preferredBackend` konfigurasi di `src/types.ts`, `src/constants.ts`, dan loadModel/predict pipelines di `src/plugin.ts` untuk support auto capability detection dan benchmark tracking
-- [x] Verifikasi build & typecheck sukses (208 tests pass)
+- [x] Verifikasi build & typecheck sukses
 
-### Tahap 7.5 — Comprehensive Tests
-- [ ] Tambahkan unit & integration tests untuk metrics dan fallback
-- [ ] Verifikasi build & tests sukses
+### Tahap 7.5 — Comprehensive Tests ✅
+- [x] Tambahkan integration tests untuk metrics dan fallback di `plugin.metrics.test.ts` dan `runtime.integration.test.ts`
+- [x] Verifikasi build & tests sukses (226 tests pass)
 
-### Tahap 7.6 — Documentation
-- [ ] Update README.md & dokumentasi final
-- [ ] Verifikasi build & tests sukses
+### Tahap 7.6 — Documentation ✅
+- [x] Update README.md, walkthrough.md, task.md, dan PROGRESS.md
+- [x] Verifikasi build & tests sukses (**226 tests pass, 44 test files**)
 
 ---
 
