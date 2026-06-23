@@ -5,6 +5,9 @@ import { fileToImageData } from './preprocess/image_data';
 import { letterboxImage } from './preprocess/letterbox';
 import { normalizePixels } from './preprocess/normalize';
 import { toCHWTensor } from './preprocess/tensor';
+import * as ort from 'onnxruntime-web';
+import { loadModel as loadModelHelper, createSession, disposeSession } from './runtime/session';
+import { runInference } from './runtime/inference';
 
 export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     readonly id = 'object-detection';
@@ -18,6 +21,7 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
     private config: ObjectDetectionConfig;
     private labels: string[] = [];
     private inputShape: number[] = [1, 3, DEFAULT_CONFIG.inputHeight, DEFAULT_CONFIG.inputWidth];
+    private session: ort.InferenceSession | null = null;
 
     constructor(config: Partial<ObjectDetectionConfig> = {}) {
         this.config = { ...DEFAULT_CONFIG, ...config };
@@ -27,8 +31,47 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
         console.log(`[${this.id}] init — config:`, this.config);
     }
 
+    async loadModel(modelFile: File): Promise<void> {
+        console.log(`[${this.id}] Loading model: ${modelFile.name}`);
+        const modelData = await loadModelHelper(modelFile);
+        this.session = await createSession(modelData, this.config.executionProviders);
+    }
+
     async dispose(): Promise<void> {
         this.labels = [];
+        if (this.session) {
+            await disposeSession(this.session);
+            this.session = null;
+        }
+    }
+
+    async predict(input: unknown): Promise<InferenceResult<DetectionResult>> {
+        const startTime = performance.now();
+        if (!this.session) {
+            throw new Error('Model belum dimuat. Panggil loadModel() terlebih dahulu.');
+        }
+
+        // 1. Preprocess
+        const preprocessed = await this.preprocess(input);
+
+        // 2. Inference
+        const rawOutput = await runInference(this.session, preprocessed);
+
+        // 3. Postprocess
+        const outputNames = this.session.outputNames;
+        const primaryOutputName = outputNames[0] || 'output0';
+        const primaryOutputTensor = rawOutput.outputs[primaryOutputName];
+        if (!primaryOutputTensor) {
+            throw new Error(`Output tensor "${primaryOutputName}" tidak ditemukan.`);
+        }
+
+        const postprocessed = await this.postprocess(primaryOutputTensor);
+        const executionTimeMs = performance.now() - startTime;
+
+        return {
+            ...postprocessed,
+            executionTimeMs,
+        };
     }
 
     loadLabels(rawText: string): void {

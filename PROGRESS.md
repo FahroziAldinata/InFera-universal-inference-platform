@@ -184,9 +184,10 @@ Commit: `344572f`
 - [x] Tambahkan unit test `inference.test.ts` using mocked InferenceSession
 - [x] Verifikasi build, typecheck, dan test sukses
 
-#### Tahap 3.4 — Plugin Integration
-- [ ] Integrasikan runtime di `src/plugin.ts`
-- [ ] Verifikasi build, typecheck, dan test sukses
+#### Tahap 3.4 — Plugin Integration ✅
+- [x] Integrasikan runtime di `src/plugin.ts` (implementasikan `loadModel`, `predict`, dan `dispose`)
+- [x] Tambahkan unit test untuk integrasi plugin lifecycle di `plugin.test.ts`
+- [x] Verifikasi build, typecheck, dan test sukses
 
 ### Object Detection Phase 4
 

@@ -3,6 +3,37 @@ import { ObjectDetectionPlugin } from '../plugin';
 import { DEFAULT_CONFIG } from '../constants';
 import type { PreprocessResult } from '../types';
 
+vi.mock('onnxruntime-web', () => {
+    return {
+        InferenceSession: {
+            create: vi.fn().mockImplementation(async (data: any, options: any) => {
+                return {
+                    inputNames: ['images'],
+                    outputNames: ['output0'],
+                    run: vi.fn().mockResolvedValue({
+                        output0: {
+                            data: new Float32Array([0.1, 0.2, 0.3]),
+                            dims: [1, 3],
+                            type: 'float32',
+                        },
+                    }),
+                    release: vi.fn(),
+                };
+            }),
+        },
+        Tensor: class MockTensor {
+            data: any;
+            dims: number[];
+            type: string;
+            constructor(type: string, data: any, dims: number[]) {
+                this.type = type;
+                this.data = data;
+                this.dims = dims;
+            }
+        },
+    };
+});
+
 beforeAll(() => {
     if (typeof globalThis.OffscreenCanvas === 'undefined') {
         globalThis.OffscreenCanvas = class MockOffscreenCanvas {
@@ -153,5 +184,29 @@ describe('ObjectDetectionPlugin', () => {
         expect(result.data[0]).toBe(100); // R channel unnormalized
         expect(result.data[totalPixels]).toBe(150); // G channel unnormalized
         expect(result.data[totalPixels * 2]).toBe(200); // B channel unnormalized
+    });
+
+    it('should load model successfully', async () => {
+        const plugin = new ObjectDetectionPlugin();
+        const file = new File([], 'test.onnx');
+        await expect(plugin.loadModel(file)).resolves.not.toThrow();
+    });
+
+    it('should throw error on predict if model is not loaded', async () => {
+        const plugin = new ObjectDetectionPlugin();
+        const file = new File([], 'test.jpg', { type: 'image/jpeg' });
+        await expect(plugin.predict(file)).rejects.toThrow('Model belum dimuat. Panggil loadModel() terlebih dahulu.');
+    });
+
+    it('should execute predict pipeline successfully when model is loaded', async () => {
+        const plugin = new ObjectDetectionPlugin();
+        const modelFile = new File([], 'test.onnx');
+        await plugin.loadModel(modelFile);
+
+        const file = new File([], 'test.jpg', { type: 'image/jpeg' });
+        const result = await plugin.predict(file);
+
+        expect(result.pluginId).toBe('object-detection');
+        expect(result.data.detections).toEqual([]);
     });
 });

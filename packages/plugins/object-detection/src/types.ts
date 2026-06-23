@@ -38,6 +38,7 @@ export interface ObjectDetectionConfig {
     confidenceThreshold: number;
     iouThreshold: number;
     normalize: boolean;
+    executionProviders?: string[];
 }
 
 export interface ImageTensor {

@@ -11,6 +11,7 @@ export const DEFAULT_CONFIG: ObjectDetectionConfig = {
     confidenceThreshold: 0.25,
     iouThreshold: 0.45,
     normalize: true,
+    executionProviders: ['wasm'],
 };
 
 export const DEFAULT_CAPABILITIES: PluginCapabilities = {
