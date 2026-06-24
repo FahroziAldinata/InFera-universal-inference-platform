@@ -54,14 +54,14 @@ const TableRow = memo(function TableRow({
             </td>
             <td className="row-actions">
                 <button
-                    className="table-action-btn"
+                    className="table-action-btn copy-btn-text"
                     onClick={(e) => {
                         e.stopPropagation();
                         onCopy(detId);
                     }}
-                    title="Salin Detail"
+                    title="Copy details"
                 >
-                    📋
+                    Copy
                 </button>
             </td>
         </tr>
@@ -75,7 +75,6 @@ export function DetectionResultTable() {
         selectedDetectionId,
         setHoveredDetectionId,
         setSelectedDetectionId,
-        focusDetection,
     } = useDetectionStore();
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -145,11 +144,8 @@ export function DetectionResultTable() {
     }, [setSelectedDetectionId]);
 
     const handleDoubleClick = useCallback((id: string) => {
-        const container = document.querySelector('.canvas-container');
-        const viewportWidth = container?.clientWidth || 640;
-        const viewportHeight = container?.clientHeight || 480;
-        focusDetection(id, viewportWidth, viewportHeight);
-    }, [focusDetection]);
+        setSelectedDetectionId(id);
+    }, [setSelectedDetectionId]);
 
     const handleCopy = useCallback((id: string) => {
         const det = detections.find((d) => d.id === id);
@@ -200,9 +196,9 @@ export function DetectionResultTable() {
                         <tr>
                             <th>#</th>
                             <th>Label</th>
-                            <th>Conf</th>
-                            <th>Box (x,y,w,h)</th>
-                            <th>Aksi</th>
+                            <th>Confidence</th>
+                            <th>Bounding Box</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>

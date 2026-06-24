@@ -5,6 +5,7 @@ import { DetectionCanvas } from '../components/DetectionCanvas';
 import { MetricsPanel } from '../components/MetricsPanel';
 import { DetectionResultTable } from '../components/DetectionResultTable';
 import { ModelManagerPanel } from '../components/ModelManagerPanel';
+import { DetectionVisualOptions } from '../components/DetectionVisualOptions';
 import { useDetectionStore } from '../store/detectionStore';
 import { disposeActivePluginInstance } from '../hooks/useObjectDetection';
 
@@ -19,8 +20,8 @@ export function ObjectDetectionPage() {
     }, []);
 
     return (
-        <div className="workspace">
-            {/* Left sidebar for model upload and controls */}
+        <div className="workspace detection-workspace">
+            {/* Left sidebar for model upload and toggles */}
             <aside className="sidebar">
                 <div className="section-header">MODEL & INPUT</div>
                 <DetectionUploader />
@@ -29,10 +30,11 @@ export function ObjectDetectionPage() {
                 
                 <div className="sidebar-divider" />
                 
-                <DetectionToolbar />
+                <div className="section-header">VISUAL OPTIONS</div>
+                <DetectionVisualOptions />
             </aside>
 
-            {/* Center area for canvas overlay visualization */}
+            {/* Center Area: Full height visualization canvas */}
             <main className="canvas-view-area">
                 {errorMessage && (
                     <div className="error-banner">
@@ -40,20 +42,43 @@ export function ObjectDetectionPage() {
                         <p className="error-text">{errorMessage}</p>
                     </div>
                 )}
-                <div className="visualizer-card card">
-                    <h3 className="card-title visualizer-title">Visualisasi Deteksi</h3>
-                    <DetectionCanvas />
-                </div>
+                <DetectionCanvas />
             </main>
 
-            {/* Right sidebar for performance benchmarks and detections lists */}
-            <aside className="right-panel">
+            {/* Right Panel: Controls, Results, and Performance metrics */}
+            <aside className="right-panel detection-right-panel">
+                {/* TOOLBAR SECTION */}
                 <div className="rp-section">
-                    <MetricsPanel />
+                    <div className="rp-section-header">
+                        <span className="rp-section-title">DETECTION CONTROLS</span>
+                    </div>
+                    <div className="rp-section-body" style={{ padding: '8px 16px' }}>
+                        <DetectionToolbar />
+                    </div>
                 </div>
+
                 <div className="rp-divider" />
-                <div className="rp-section rp-section--grow">
-                    <DetectionResultTable />
+
+                {/* RESULTS SECTION */}
+                <div className="rp-section rp-section--grow" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+                    <div className="rp-section-header">
+                        <span className="rp-section-title">DETECTION RESULTS</span>
+                    </div>
+                    <div className="rp-section-body rp-section-body--scroll" style={{ flex: 1, overflowY: 'auto' }}>
+                        <DetectionResultTable />
+                    </div>
+                </div>
+
+                <div className="rp-divider" />
+
+                {/* METRICS SECTION */}
+                <div className="rp-section" style={{ flexShrink: 0 }}>
+                    <div className="rp-section-header">
+                        <span className="rp-section-title">PERFORMANCE METRICS</span>
+                    </div>
+                    <div className="rp-section-body" style={{ padding: '0 0 12px 0' }}>
+                        <MetricsPanel />
+                    </div>
                 </div>
             </aside>
         </div>

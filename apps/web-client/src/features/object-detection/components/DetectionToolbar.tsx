@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useDetectionStore } from '../store/detectionStore';
 import { downloadCanvasResult } from '../utils/exportDetection';
 import { EXPORT_FORMATTERS, downloadStringAsFile } from '../utils/exportFormatter';
@@ -6,25 +5,14 @@ import { EXPORT_FORMATTERS, downloadStringAsFile } from '../utils/exportFormatte
 export function DetectionToolbar() {
     const {
         step,
-        showLabels,
-        showBoxes,
-        showConfidence,
-        showCrosshair,
-        showTooltip,
-        selectedDetectionId,
-        detections,
-        imageFile,
-        setShowLabels,
-        setShowBoxes,
-        setShowConfidence,
-        setShowCrosshair,
-        setShowTooltip,
+        zoom,
+        imageWidth,
+        imageHeight,
         setZoom,
         setPan,
-        focusDetection,
+        detections,
+        imageFile,
     } = useDetectionStore();
-
-    const [selectedFormatId, setSelectedFormatId] = useState('json');
 
     const isDone = step === 'done';
 
@@ -43,165 +31,80 @@ export function DetectionToolbar() {
     }
 
     const handleMetadataExport = () => {
-        const formatter = EXPORT_FORMATTERS.find(f => f.id === selectedFormatId);
+        const formatter = EXPORT_FORMATTERS.find(f => f.id === 'json');
         if (!formatter) return;
 
-        const img = document.querySelector('.canvas-source-img') as HTMLImageElement | null;
-        const imageWidth = img?.naturalWidth || 640;
-        const imageHeight = img?.naturalHeight || 640;
         const imageName = imageFile?.name || 'image.jpg';
-
         const content = formatter.format(detections, {
             imageName,
-            imageWidth,
-            imageHeight
+            imageWidth: imageWidth || 640,
+            imageHeight: imageHeight || 640
         });
 
         const dotIdx = imageName.lastIndexOf('.');
         const baseName = dotIdx !== -1 ? imageName.substring(0, dotIdx) : imageName;
-        const exportFilename = `${baseName}_detections.${formatter.extension}`;
+        const exportFilename = `${baseName}_detections.json`;
         
         downloadStringAsFile(content, exportFilename, formatter.mimeType);
     };
 
-    const handleActualSize = () => {
-        setZoom(1.0);
-        setPan(0, 0);
+    const handleZoomIn = () => {
+        if (!imageWidth || !imageHeight) return;
+        const newZoom = Math.min(zoom * 1.25, 10);
+        setZoom(newZoom);
+    };
+
+    const handleZoomOut = () => {
+        if (!imageWidth || !imageHeight) return;
+        const newZoom = Math.max(zoom / 1.25, 0.25);
+        setZoom(newZoom);
     };
 
     const handleFitView = () => {
-        const img = document.querySelector('.canvas-source-img') as HTMLImageElement | null;
+        if (!imageWidth || !imageHeight) return;
         const container = document.querySelector('.canvas-container');
-        if (img && container && img.naturalWidth && img.naturalHeight) {
-            const rect = container.getBoundingClientRect();
-            const scaleX = rect.width / img.naturalWidth;
-            const scaleY = rect.height / img.naturalHeight;
-            // Fits image with a small border pad (0.95 scale factor)
-            const fitScale = Math.max(0.1, Math.min(Math.min(scaleX, scaleY) * 0.95, 20));
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        const scaleX = rect.width / imageWidth;
+        const scaleY = rect.height / imageHeight;
+        const fitScale = Math.max(0.25, Math.min(Math.min(scaleX, scaleY) * 0.9, 10));
 
-            const centeredPanX = (rect.width - img.naturalWidth * fitScale) / 2;
-            const centeredPanY = (rect.height - img.naturalHeight * fitScale) / 2;
-
-            setZoom(fitScale);
-            setPan(centeredPanX, centeredPanY);
-        } else {
-            setZoom(1.0);
-            setPan(0, 0);
-        }
+        setZoom(fitScale);
+        setPan(0, 0);
     };
 
-    const handleCenterSelection = () => {
-        if (!selectedDetectionId) return;
-        const container = document.querySelector('.canvas-container');
-        const viewportWidth = container?.clientWidth || 640;
-        const viewportHeight = container?.clientHeight || 480;
-        focusDetection(selectedDetectionId, viewportWidth, viewportHeight);
-    };
+    if (!imageFile) return null;
 
     return (
-        <div className="toolbar-section card">
-            <h3 className="card-title">Opsi Visualisasi</h3>
+        <div className="detection-toolbar-row card">
+            <div className="toolbar-group">
+                <span className="group-label">Export:</span>
+                <button className="btn-secondary toolbar-btn" disabled={!isDone} onClick={() => handleExport('png')}>
+                    PNG
+                </button>
+                <button className="btn-secondary toolbar-btn" disabled={!isDone} onClick={() => handleExport('jpeg')}>
+                    JPEG
+                </button>
+                <button className="btn-secondary toolbar-btn" disabled={!isDone} onClick={handleMetadataExport}>
+                    JSON
+                </button>
+            </div>
             
-            {/* Visual Toggles */}
-            <div className="toggles-grid">
-                <label className="toolbar-checkbox-label">
-                    <input
-                        type="checkbox"
-                        checked={showBoxes}
-                        onChange={(e) => setShowBoxes(e.target.checked)}
-                    />
-                    Bounding Boxes
-                </label>
-                <label className="toolbar-checkbox-label">
-                    <input
-                        type="checkbox"
-                        checked={showLabels}
-                        onChange={(e) => setShowLabels(e.target.checked)}
-                    />
-                    Labels
-                </label>
-                <label className="toolbar-checkbox-label" style={{ opacity: showLabels ? 1 : 0.5 }}>
-                    <input
-                        type="checkbox"
-                        checked={showConfidence}
-                        disabled={!showLabels}
-                        onChange={(e) => setShowConfidence(e.target.checked)}
-                    />
-                    Confidence
-                </label>
-                <label className="toolbar-checkbox-label">
-                    <input
-                        type="checkbox"
-                        checked={showTooltip}
-                        onChange={(e) => setShowTooltip(e.target.checked)}
-                    />
-                    Tooltips (60 FPS)
-                </label>
-                <label className="toolbar-checkbox-label">
-                    <input
-                        type="checkbox"
-                        checked={showCrosshair}
-                        onChange={(e) => setShowCrosshair(e.target.checked)}
-                    />
-                    HUD Crosshair
-                </label>
+            <div className="toolbar-divider-v" />
+            
+            <div className="toolbar-group">
+                <span className="group-label">Zoom:</span>
+                <button className="btn-secondary toolbar-btn" onClick={handleZoomIn}>
+                    +
+                </button>
+                <button className="btn-secondary toolbar-btn" onClick={handleZoomOut}>
+                    -
+                </button>
+                <button className="btn-secondary toolbar-btn" onClick={handleFitView}>
+                    Fit
+                </button>
+                <span className="zoom-text">{(zoom * 100).toFixed(0)}%</span>
             </div>
-
-            <div className="toolbar-divider" />
-
-            {/* View Reset Controls */}
-            <div className="view-controls-row" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                    <button className="btn-secondary" style={{ flex: 1 }} onClick={handleActualSize}>
-                        100% Size
-                    </button>
-                    <button className="btn-secondary" style={{ flex: 1 }} onClick={handleFitView}>
-                        Fit View
-                    </button>
-                </div>
-                {selectedDetectionId && (
-                    <button className="btn-primary" onClick={handleCenterSelection}>
-                        Center Selection 🎯
-                    </button>
-                )}
-            </div>
-
-            {/* Export buttons */}
-            {isDone && (
-                <>
-                    <div className="toolbar-divider" />
-                    <div className="export-controls-row">
-                        <span className="export-label">Ekspor Gambar</span>
-                        <div className="export-btn-group">
-                            <button className="btn-secondary btn-export" onClick={() => handleExport('png')}>
-                                PNG
-                            </button>
-                            <button className="btn-secondary btn-export" onClick={() => handleExport('jpeg')}>
-                                JPEG
-                            </button>
-                        </div>
-                    </div>
-                    <div className="toolbar-divider" />
-                    <div className="export-controls-row">
-                        <span className="export-label">Ekspor Anotasi</span>
-                        <div style={{ display: 'flex', gap: '4px' }}>
-                            <select
-                                className="select-input"
-                                value={selectedFormatId}
-                                onChange={(e) => setSelectedFormatId(e.target.value)}
-                                style={{ flex: 1, minWidth: 0 }}
-                            >
-                                {EXPORT_FORMATTERS.map(f => (
-                                    <option key={f.id} value={f.id}>{f.name}</option>
-                                ))}
-                            </select>
-                            <button className="btn-primary" onClick={handleMetadataExport} style={{ padding: '5px 10px', fontSize: '11px', whiteSpace: 'nowrap' }}>
-                                Ekspor
-                            </button>
-                        </div>
-                    </div>
-                </>
-            )}
         </div>
     );
 }

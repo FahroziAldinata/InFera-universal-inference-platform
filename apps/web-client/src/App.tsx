@@ -4,6 +4,7 @@ import { ImageUploader } from './components/ImageUploader';
 import { RunButton } from './components/RunButton';
 import { useInferenceStore } from './store/inferenceStore';
 import { ObjectDetectionPage } from './features/object-detection/pages/ObjectDetectionPage';
+import { ResultExplanationPanel } from './components/ResultExplanationPanel';
 import './App.css';
 
 function StatusBar() {
@@ -36,7 +37,9 @@ function StatusBar() {
 }
 
 function RightPanel() {
-  const { step, modelInfo, imagePreviewUrl, result, executionTimeMs, errorMessage } = useInferenceStore();
+  const { step, modelInfo, result, executionTimeMs, errorMessage } = useInferenceStore();
+
+  const topPrediction = result && result.topK.length > 0 ? result.topK[0] : null;
 
   return (
     <div className="right-panel">
@@ -86,38 +89,22 @@ function RightPanel() {
 
       <div className="rp-divider" />
 
-      {/* INPUT IMAGE */}
-      <div className="rp-section">
-        <div className="rp-section-header">
-          <span className="rp-section-title">INPUT IMAGE</span>
-        </div>
-        <div className="rp-section-body">
-          {!imagePreviewUrl ? (
-            <p className="rp-empty">No image selected.</p>
-          ) : (
-            <img src={imagePreviewUrl} alt="Input preview" className="rp-image-preview" />
-          )}
-        </div>
-      </div>
-
-      <div className="rp-divider" />
-
       {/* OUTPUT */}
-      <div className="rp-section rp-section--grow">
+      <div className="rp-section">
         <div className="rp-section-header">
           <span className="rp-section-title">OUTPUT</span>
           {executionTimeMs !== null && (
             <span className="rp-section-meta">{executionTimeMs.toFixed(2)} ms</span>
           )}
         </div>
-        <div className="rp-section-body rp-section-body--scroll">
+        <div className="rp-section-body">
           {step === 'error' && errorMessage ? (
             <p className="error-message">{errorMessage}</p>
           ) : step !== 'done' || !result ? (
             <p className="rp-empty">Run inference to see results.</p>
           ) : (
             <ul className="result-list">
-              {result.topK.map((item) => (
+              {result.topK.slice(0, 3).map((item) => (
                 <li key={item.rank} className={`result-item ${item.rank === 1 ? 'result-item--top' : ''}`}>
                   <span className="result-rank">#{item.rank}</span>
                   <div className="result-bar-wrap">
@@ -136,12 +123,21 @@ function RightPanel() {
         </div>
       </div>
 
+      {/* DYNAMIC EXPLANATION PANEL */}
+      {step === 'done' && topPrediction && (
+        <>
+          <div className="rp-divider" />
+          <ResultExplanationPanel label={topPrediction.label} confidence={topPrediction.confidence} />
+        </>
+      )}
+
     </div>
   );
 }
 
 function App() {
   const [activeTab, setActiveTab] = useState<'classification' | 'detection'>('classification');
+  const { imagePreviewUrl } = useInferenceStore();
 
   return (
     <div className="workstation">
@@ -167,7 +163,7 @@ function App() {
       </div>
 
       {activeTab === 'classification' ? (
-        <div className="workspace">
+        <div className="workspace classification-workspace">
           <aside className="sidebar">
             <div className="section-header">MODEL</div>
             <ModelUploader />
@@ -176,6 +172,19 @@ function App() {
             <ImageUploader />
             <RunButton />
           </aside>
+
+          {/* Large centered image preview area */}
+          <main className="classification-preview-area">
+            {imagePreviewUrl ? (
+              <div className="classification-img-container">
+                <img src={imagePreviewUrl} alt="Preview target" className="classification-main-img" />
+              </div>
+            ) : (
+              <div className="classification-placeholder">
+                <p className="placeholder-text">Pilih atau unggah gambar untuk memulai klasifikasi.</p>
+              </div>
+            )}
+          </main>
 
           <RightPanel />
         </div>

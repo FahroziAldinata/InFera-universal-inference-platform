@@ -236,5 +236,87 @@ pnpm test
 ```
 - **Build Status**: ✅ PASS
 - **Typecheck Status**: ✅ PASS
-- **Test Status**: ✅ PASS (250 tests passed, 46 test files)
+- **Test Status**: ✅ PASS (252 tests passed, 46 test files)
+
+---
+
+## 10. Object Detection Centering and Coordinate Mapping Alignment
+
+We resolved a layout alignment bug where the object detection preview image was pushed off-center (to the far right) and hover/click target coordinates on the bounding boxes were misaligned during zoom.
+
+### Cause of the Issue:
+1. **Asynchronous Zustand Store Updates**: On image load, `handleImageLoad` immediately invoked `fitToCenter()`. However, the dimensions in the Zustand store (`imageWidth`/`imageHeight`) had not yet propagated, causing the viewport fit calculations to evaluate as `null`/`0` and fall back to a scale of `1.0`.
+2. **Missing CSS Positioning Rules**: Centering calculations were delegated to CSS absolute positioning on `.canvas-transform-wrapper`. However, the CSS wrapper class was set to `position: relative`, causing it to flow standard inline-block layout aligning to the left, which misaligned centering when zooming.
+3. **Mismatched Toolbar Handlers**: The "Fit" and Zoom buttons computed separate translations that conflicted with CSS centering.
+
+### Implementation Fixes:
+1. **CSS Absolute Centering**: Set `.canvas-transform-wrapper` in [App.css](file:///c:/Infera/apps/web-client/src/App.css) to `position: absolute; left: 50%; top: 50%` and added `translate(-50%, -50%)` to the inline element style. This locks the visual center of the canvas to the center of `.canvas-container`.
+2. **Direct Dimension Arguments**: Modified `fitToCenter` and `applyCenteredZoom` in [useCanvasViewport.ts](file:///c:/Infera/apps/web-client/src/features/object-detection/hooks/useCanvasViewport.ts) to accept optional width/height parameters. This allows `handleImageLoad` to pass the loaded dimensions directly, bypassing state updates latency.
+3. **Precise Coordinate Projections**: Replaced the translation offset math in [DetectionCanvas.tsx](file:///c:/Infera/apps/web-client/src/features/object-detection/components/DetectionCanvas.tsx):
+   ```typescript
+   const virtualPanX = rect.width / 2 + panX - (imgWidth * zoom) / 2;
+   const virtualPanY = rect.height / 2 + panY - (imgHeight * zoom) / 2;
+   ```
+   This guarantees that mouse hover and selection coordinates map perfectly to bounding boxes at any zoom level.
+4. **Synchronized Toolbar Action**: Updated `handleFitView` in [DetectionToolbar.tsx](file:///c:/Infera/apps/web-client/src/features/object-detection/components/DetectionToolbar.tsx) to set `pan` to `(0, 0)` so it aligns correctly with the CSS centering logic.
+
+### Verification Status:
+All unit, integration, and UI component calculations compile, typecheck, and pass successfully:
+- **Build Status**: ✅ PASS
+- **Typecheck Status**: ✅ PASS
+- **Test Status**: ✅ PASS (252 tests passed, 46 test files)
+
+---
+
+## 11. Image Classification Preview Scaling Enhancement
+
+We resolved a styling constraint where small input images (such as standard Model inputs like 224x224) remained tiny inside the middle preview panel, leaving massive empty whitespace in the classification workspace.
+
+### Cause of the Issue:
+CSS rules on `.classification-main-img` only specified `max-width: 90%` and `max-height: 90%`. While this successfully prevented larger images from overflowing, it did not force smaller images to scale up to occupy the container space, causing them to render only at their tiny natural dimensions.
+
+### Implementation Fixes:
+Updated `.classification-main-img` styling in [App.css](file:///c:/Infera/apps/web-client/src/App.css):
+```css
+.classification-main-img {
+  width: 100%;
+  height: 100%;
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+}
+```
+Setting `width: 100%` and `height: 100%` alongside `max-width` and `max-height` constraints instructs the browser to scale smaller images up to fill up to 90% of the viewport area, while `object-fit: contain` ensures their aspect ratio is preserved without distortion.
+
+### Verification Status:
+- **Build Status**: ✅ PASS
+- **Typecheck Status**: ✅ PASS
+- **Test Status**: ✅ PASS (252 tests passed, 46 test files)
+
+---
+
+## 12. Object Detection 3-Column Layout Refactor
+
+We restructured the Object Detection page layout to match the premium 3-column layout of the Image Classification page.
+
+### Cause of the Issue:
+Previously, the Object Detection workspace placed the canvas, toolbar, metrics panels, and results table in a single vertical scrolling column. This made it look less consistent with the 3-column classification layout, caused unnecessary scrolling, and wasted space.
+
+### Implementation Fixes:
+1. **3-Column Grid**: Updated `.detection-workspace` in [App.css](file:///c:/Infera/apps/web-client/src/App.css) to use a 3-column desktop layout matching classification: `var(--sidebar-w) 1fr 340px`.
+2. **Component Relocation**: Refactored [ObjectDetectionPage.tsx](file:///c:/Infera/apps/web-client/src/features/object-detection/pages/ObjectDetectionPage.tsx):
+   - **Column 1 (Left Sidebar)**: Handles model and package loads, and visual overlay settings.
+   - **Column 2 (Center Preview)**: Dedicated purely to the centered detection canvas (`DetectionCanvas`), allowing full height/width visibility.
+   - **Column 3 (Right Panel)**: Dynamic panel (`.detection-right-panel`) stacking controls/toolbar, virtualized results list, performance metrics breakdown, and inference history.
+3. **Narrow Layout Styling**: Added overrides in [App.css](file:///c:/Infera/apps/web-client/src/App.css) for elements when rendered inside `.detection-right-panel` to ensure they fit the 340px width:
+   - Stacked the toolbar controls vertically and hid the vertical separator.
+   - Squeezed padding of the results table rows to `5px 6px` and copy buttons to prevent ugly text wrapping.
+
+### Verification Status:
+- **Build Status**: ✅ PASS
+- **Typecheck Status**: ✅ PASS
+- **Test Status**: ✅ PASS (252 tests passed, 46 test files)
 

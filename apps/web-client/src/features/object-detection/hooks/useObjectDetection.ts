@@ -93,8 +93,8 @@ export function useObjectDetection() {
                 labelsList = labelText.split('\n').map(l => l.trim()).filter(Boolean);
             }
 
-            // Read the dynamic/default input shape from plugin config
-            const inputShape = ((plugin as unknown as Record<string, unknown>).inputShape as number[]) || [1, 3, 640, 640];
+            // Read the dynamic/auto-detected input shape from plugin
+            const inputShape = plugin.getInputShape();
 
             setModelInfo(modelFile.name, labelsList, inputShape);
 

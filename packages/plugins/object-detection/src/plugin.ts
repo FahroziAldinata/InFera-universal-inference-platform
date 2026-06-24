@@ -58,6 +58,88 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
         );
         this.session = session;
         this.backend = backend;
+
+        // Auto-detect input shape from the ONNX session metadata.
+        // This prevents dimension mismatches when the model expects e.g. 224×224
+        // but the plugin defaults to 640×640.
+        this.autoDetectInputShape(session);
+    }
+
+    /**
+     * Returns the current input shape (NCHW format).
+     * Consumers should prefer this getter over accessing the private field.
+     */
+    getInputShape(): number[] {
+        return [...this.inputShape];
+    }
+
+    /**
+     * Reads the first input tensor's shape from an ONNX session and updates
+     * this.inputShape + this.config.inputWidth/inputHeight accordingly.
+     * Tries multiple internal paths to cover different onnxruntime-web versions.
+     */
+    private autoDetectInputShape(session: ort.InferenceSession): void {
+        try {
+            const firstInputName = session.inputNames[0];
+            if (!firstInputName) return;
+
+            const s = session as any;
+
+            // Strategy 1: handler._model.graph.input (onnxruntime-web ~1.17+)
+            let dims = this.extractDimsFromGraphInput(
+                s?.handler?.['_model']?.graph?.input
+            );
+
+            // Strategy 2: handler._model.graph.node input (alternative path)
+            if (!dims) {
+                dims = this.extractDimsFromGraphInput(
+                    s?.handler?.model?.graph?.input
+                );
+            }
+
+            // Strategy 3: session._model (some builds)
+            if (!dims) {
+                dims = this.extractDimsFromGraphInput(
+                    s?.['_model']?.graph?.input
+                );
+            }
+
+            if (dims) {
+                const [n, c, h, w] = dims;
+                if (h > 0 && w > 0) {
+                    this.inputShape = [n || 1, c || 3, h, w];
+                    this.config.inputHeight = h;
+                    this.config.inputWidth = w;
+                    console.log(`[${this.id}] Auto-detected input shape from ONNX: [${this.inputShape.join(', ')}]`);
+                    return;
+                }
+            }
+        } catch (err) {
+            console.warn(`[${this.id}] Could not auto-detect input shape from session:`, err);
+        }
+        // If auto-detection fails, keep current defaults
+        console.log(`[${this.id}] Using default input shape: [${this.inputShape.join(', ')}]`);
+    }
+
+    /**
+     * Extracts NCHW dims from a graph input array structure.
+     * Returns a 4-element number array or null if extraction fails.
+     */
+    private extractDimsFromGraphInput(graphInput: any): number[] | null {
+        try {
+            if (!graphInput || !Array.isArray(graphInput) || graphInput.length === 0) return null;
+            const dimArray = graphInput[0]?.type?.tensorType?.shape?.dim;
+            if (!dimArray || !Array.isArray(dimArray) || dimArray.length !== 4) return null;
+            return dimArray.map((d: any) => {
+                const val = d.dimValue;
+                if (val !== undefined && val !== null) {
+                    return typeof val === 'bigint' ? Number(val) : Number(val);
+                }
+                return 0;
+            });
+        } catch {
+            return null;
+        }
     }
 
     async dispose(): Promise<void> {
@@ -78,6 +160,19 @@ export class ObjectDetectionPlugin implements InferencePlugin<DetectionResult> {
         const preprocessed = await this.preprocess(input);
         this.lastPreprocessResult = preprocessed;
         const preprocessTimeMs = performance.now() - tPreStart;
+
+        // 1.5 Validate preprocessed tensor shape matches model expectations
+        const expectedH = this.inputShape[2] ?? this.config.inputHeight;
+        const expectedW = this.inputShape[3] ?? this.config.inputWidth;
+        const actualH = preprocessed.dims[2];
+        const actualW = preprocessed.dims[3];
+        if (actualH !== expectedH || actualW !== expectedW) {
+            throw new Error(
+                `Input shape mismatch: model expects ${expectedW}×${expectedH} ` +
+                `but preprocessed tensor is ${actualW}×${actualH}. ` +
+                `Current inputShape: [${this.inputShape.join(', ')}]`
+            );
+        }
 
         // 2. Inference
         const tInfStart = performance.now();

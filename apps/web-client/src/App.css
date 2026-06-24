@@ -568,7 +568,7 @@ body {
 }
 
 .result-bar-bg {
-  height: 3px;
+  height: 8px;
   background: var(--border-bright);
   border-radius: 99px;
   overflow: hidden;
@@ -576,14 +576,14 @@ body {
 
 .result-bar-fill {
   height: 100%;
-  background: var(--accent);
+  background: var(--tx-3);
   border-radius: 99px;
   transition: width 0.4s ease;
-  box-shadow: 0 0 6px var(--accent-glow);
 }
 
 .result-item--top .result-bar-fill {
-  background: var(--accent);
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
 }
 
 /* ── Error ───────────────────────────────────────────────── */
@@ -689,14 +689,14 @@ body {
 }
 
 .visualizer-card {
-  flex: 1;
+  height: 500px;
   display: flex;
   flex-direction: column;
-  min-height: 0;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--surface-1);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .visualizer-title {
@@ -708,29 +708,27 @@ body {
   text-transform: uppercase;
 }
 
-/* ── Canvas Viewport / Zoom & Pan ────────────────────────── */
+/* ── Canvas Viewport / Zoom Only ─────────────────────────── */
 .canvas-container {
   flex: 1;
   position: relative;
   background: #09090c;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  cursor: default;
 }
 
 .canvas-transform-wrapper {
-  position: relative;
-  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
   user-select: none;
   touch-action: none;
   transition: transform 0.05s ease-out;
+  transform-origin: center center;
 }
 
 .canvas-overlay {
   display: block;
-  max-width: 100%;
-  max-height: 80vh;
   object-fit: contain;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
@@ -1374,15 +1372,347 @@ body {
   border-left: 2px solid var(--accent);
 }
 
-.canvas-transform-wrapper {
-  transform-origin: 0 0 !important;
-}
 
-.canvas-container {
-  overflow: hidden;
-  position: relative;
-}
 
 .table-row--hovered {
   background: var(--hover) !important;
+}
+
+/* ── New Classification Layout ── */
+.classification-workspace {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr 340px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.classification-preview-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #09090c;
+  padding: 24px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.classification-img-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.classification-main-img {
+  width: 100%;
+  height: 100%;
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+}
+
+.classification-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tx-3);
+  font-style: italic;
+  font-size: 13px;
+}
+
+/* ── Result Explanation Panel ── */
+.explanation-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.explanation-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.explanation-label {
+  color: var(--tx-3);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.explanation-value {
+  font-weight: 600;
+}
+
+.explanation-value.highlight {
+  color: #fff;
+}
+
+.status-badge.confidence-high {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.status-badge.confidence-medium {
+  background: rgba(245, 197, 24, 0.12);
+  color: var(--yellow);
+  border: 1px solid rgba(245, 197, 24, 0.25);
+}
+
+.status-badge.confidence-low {
+  background: rgba(255, 95, 87, 0.12);
+  color: var(--red);
+  border: 1px solid rgba(255, 95, 87, 0.25);
+}
+
+.explanation-detail {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.detail-header, .notes-header {
+  display: block;
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--tx-3);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+}
+
+.detail-body {
+  font-size: 12px;
+  color: var(--tx-2);
+  line-height: 1.5;
+}
+
+.explanation-notes {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.notes-body {
+  font-size: 11px;
+  color: var(--tx-3);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* ── New Object Detection Layout ── */
+.detection-workspace {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr 340px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.detection-right-panel .detection-toolbar-row {
+  border: none;
+  background: transparent;
+  padding: 4px 0;
+  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.detection-right-panel .toolbar-divider-v {
+  display: none;
+}
+
+.detection-right-panel .result-table th,
+.detection-right-panel .result-table td {
+  padding: 5px 6px;
+  font-size: 11px;
+}
+
+.detection-right-panel .row-box {
+  font-size: 10px;
+}
+
+.detection-right-panel .copy-btn-text {
+  padding: 1px 6px !important;
+  font-size: 10px !important;
+}
+
+.detection-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* ── Visual Options ── */
+.visual-options-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  gap: 10px;
+}
+
+.sidebar-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--tx-2);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.1s;
+}
+
+.sidebar-checkbox-label:hover {
+  color: #fff;
+}
+
+.sidebar-checkbox-label input[type="checkbox"] {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ── New Horizontal Toolbar ── */
+.detection-toolbar-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.group-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--tx-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-right: 4px;
+}
+
+.toolbar-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 50px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.toolbar-divider-v {
+  width: 1px;
+  height: 20px;
+  background: var(--border-bright);
+  align-self: center;
+}
+
+.zoom-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--tx-2);
+  padding-left: 6px;
+}
+
+/* ── Styled Copy Action Button ── */
+.copy-btn-text {
+  background: var(--accent-dim) !important;
+  color: var(--accent) !important;
+  border: 1px solid var(--accent-glow) !important;
+  font-weight: 600 !important;
+  padding: 2px 10px !important;
+  font-size: 11px !important;
+  border-radius: 3px !important;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.copy-btn-text:hover {
+  background: var(--accent) !important;
+  color: #fff !important;
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+/* ── Responsive Mobile Layout ── */
+@media (max-width: 768px) {
+  .workstation {
+    grid-template-rows: auto 1fr auto;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .classification-workspace, .detection-workspace {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .classification-preview-area {
+    height: 350px !important;
+    padding: 16px;
+  }
+
+  .classification-main-img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .right-panel {
+    width: 100% !important;
+    height: auto;
+    overflow: visible;
+  }
+
+  .visualizer-card {
+    height: 350px !important;
+  }
+
+  .detection-main-content {
+    height: auto;
+    overflow: visible;
+    padding: 12px;
+  }
+
+  .result-table-scroll {
+    overflow-x: auto;
+  }
+
+  .detection-toolbar-row {
+    justify-content: space-between;
+  }
 }

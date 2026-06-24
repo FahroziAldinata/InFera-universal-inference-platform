@@ -29,6 +29,8 @@ export interface DetectionState {
     inputShape: number[];
     imageFile: File | null;
     imagePreviewUrl: string | null;
+    imageWidth: number | null;
+    imageHeight: number | null;
     detections: Detection[];
     metrics: InferenceMetrics | null;
     errorMessage: string | null;
@@ -55,6 +57,7 @@ export interface DetectionState {
     setStep: (step: DetectionStep) => void;
     setModelInfo: (name: string, labels: string[], shape: number[]) => void;
     setImageFile: (file: File, previewUrl: string) => void;
+    setImageDims: (w: number, h: number) => void;
     setDetections: (detections: Detection[], metrics: InferenceMetrics | null) => void;
     setError: (message: string) => void;
     setCachedModels: (models: SavedModel[]) => void;
@@ -70,7 +73,7 @@ export interface DetectionState {
     setHoveredDetectionId: (id: string | null) => void;
     setSelectedDetectionId: (id: string | null) => void;
     setSelectedDetectionIds: (ids: string[]) => void;
-    focusDetection: (id: string, viewportWidth: number, viewportHeight: number) => void;
+
     reset: () => void;
 }
 
@@ -81,6 +84,8 @@ const initialState = {
     inputShape: [1, 3, 640, 640],
     imageFile: null,
     imagePreviewUrl: null,
+    imageWidth: null,
+    imageHeight: null,
     detections: [],
     metrics: null,
     errorMessage: null,
@@ -133,6 +138,8 @@ export const useDetectionStore = create<DetectionState>()(
             step: 'image-ready',
             imageFile: file,
             imagePreviewUrl: previewUrl,
+            imageWidth: null,
+            imageHeight: null,
             detections: [],
             metrics: null,
             errorMessage: null,
@@ -168,32 +175,13 @@ export const useDetectionStore = create<DetectionState>()(
     setShowConfidence: (show) => set({ showConfidence: show }),
     setShowCrosshair: (show) => set({ showCrosshair: show }),
     setShowTooltip: (show) => set({ showTooltip: show }),
-    setZoom: (zoom) => set({ zoom: Math.max(0.1, Math.min(zoom, 20)) }),
+    setZoom: (zoom) => set({ zoom: Math.max(0.25, Math.min(zoom, 10)) }),
     setPan: (x, y) => set({ panX: x, panY: y }),
+    setImageDims: (w, h) => set({ imageWidth: w, imageHeight: h }),
     setHoveredDetectionId: (id) => set({ hoveredDetectionId: id }),
     setSelectedDetectionId: (id) => set({ selectedDetectionId: id }),
     setSelectedDetectionIds: (ids) => set({ selectedDetectionIds: ids }),
-    focusDetection: (id, viewportWidth, viewportHeight) => {
-        const state = get();
-        const det = state.detections.find((d) => d.id === id);
-        if (!det) return;
 
-        // Double click sets absolute zoom to 2.0x
-        const targetZoom = 2; 
-        const centerX = det.x + det.width / 2;
-        const centerY = det.y + det.height / 2;
-
-        // Align target center to viewport center
-        const targetPanX = viewportWidth / 2 - centerX * targetZoom;
-        const targetPanY = viewportHeight / 2 - centerY * targetZoom;
-
-        set({
-            selectedDetectionId: id,
-            zoom: targetZoom,
-            panX: targetPanX,
-            panY: targetPanY,
-        });
-    },
 
     reset: () => {
         const state = get();
@@ -218,9 +206,7 @@ export const useDetectionStore = create<DetectionState>()(
                 showConfidence: state.showConfidence,
                 showCrosshair: state.showCrosshair,
                 showTooltip: state.showTooltip,
-                zoom: state.zoom,
-                panX: state.panX,
-                panY: state.panY,
+
                 selectedDetectionId: state.selectedDetectionId,
                 selectedDetectionIds: state.selectedDetectionIds,
             }),

@@ -17,12 +17,13 @@ export function DetectionCanvas() {
         zoom,
         panX,
         panY,
+        imageWidth,
+        imageHeight,
         hoveredDetectionId,
         selectedDetectionId,
-        setZoom,
         setHoveredDetectionId,
         setSelectedDetectionId,
-        focusDetection,
+        setImageDims,
     } = useDetectionStore();
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -32,26 +33,27 @@ export function DetectionCanvas() {
     const animationFrameId = useRef<number | null>(null);
     const dashOffsetRef = useRef(0);
 
-    // Connect viewport hooks (dragging and wheel zooming)
+    // Connect viewport hook (center-based zoom only, no pan/drag)
     const {
-        isDragging,
-        handleMouseDown,
-        handleMouseMove: handleViewportMouseMove,
-        handleMouseUp,
-        handleWheel,
-        resetViewport,
+        fitToCenter,
     } = useCanvasViewport(containerRef);
 
     // Register global keyboard listeners
     useDetectionSelection();
 
-    // Fits/centers canvas when a new image is loaded
-    const handleImageLoad = useCallback(() => {
+    // Helper to get current image dimensions
+    const getImageDims = useCallback(() => {
         const img = imageRef.current;
-        if (img) {
-            resetViewport(img.naturalWidth, img.naturalHeight);
+        return img ? { w: img.naturalWidth, h: img.naturalHeight } : null;
+    }, []);
+
+    const handleImageLoad = useCallback(() => {
+        const dims = getImageDims();
+        if (dims) {
+            setImageDims(dims.w, dims.h);
+            fitToCenter(dims.w, dims.h);
         }
-    }, [resetViewport]);
+    }, [fitToCenter, getImageDims, setImageDims]);
 
     useEffect(() => {
         if (imageRef.current?.complete) {
@@ -61,8 +63,6 @@ export function DetectionCanvas() {
 
     // Track mouse pointer coordinates to determine box hover and tooltip updates
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        handleViewportMouseMove(e);
-
         if (!canvasRef.current || !containerRef.current || detections.length === 0) {
             if (tooltipRef.current) tooltipRef.current.style.display = 'none';
             return;
@@ -73,7 +73,12 @@ export function DetectionCanvas() {
         const mouseY = e.clientY - rect.top;
 
         // Project coordinate relative to container into unscaled image coordinates
-        const imagePoint = canvasToImage(mouseX, mouseY, zoom, panX, panY);
+        const imgWidth = imageWidth || 0;
+        const imgHeight = imageHeight || 0;
+        const virtualPanX = rect.width / 2 + panX - (imgWidth * zoom) / 2;
+        const virtualPanY = rect.height / 2 + panY - (imgHeight * zoom) / 2;
+
+        const imagePoint = canvasToImage(mouseX, mouseY, zoom, virtualPanX, virtualPanY);
 
         // Find match using spatial priorities
         const hovered = findDetectionAtPoint(imagePoint.x, imagePoint.y, detections);
@@ -106,13 +111,18 @@ export function DetectionCanvas() {
 
     // Clicking container updates selected detection element
     const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (isDragging || e.button !== 0 || !containerRef.current) return;
+        if (e.button !== 0 || !containerRef.current) return;
 
         const rect = containerRef.current.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        const imagePoint = canvasToImage(mouseX, mouseY, zoom, panX, panY);
+        const imgWidth = imageWidth || 0;
+        const imgHeight = imageHeight || 0;
+        const virtualPanX = rect.width / 2 + panX - (imgWidth * zoom) / 2;
+        const virtualPanY = rect.height / 2 + panY - (imgHeight * zoom) / 2;
+
+        const imagePoint = canvasToImage(mouseX, mouseY, zoom, virtualPanX, virtualPanY);
         const clicked = findDetectionAtPoint(imagePoint.x, imagePoint.y, detections);
 
         if (clicked) {
@@ -122,23 +132,7 @@ export function DetectionCanvas() {
         }
     };
 
-    // Double-clicking focuses and centers viewport onto bounding box
-    const handleDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!containerRef.current) return;
-        const rect = containerRef.current.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        const imagePoint = canvasToImage(mouseX, mouseY, zoom, panX, panY);
-        const clicked = findDetectionAtPoint(imagePoint.x, imagePoint.y, detections);
-
-        if (clicked && clicked.id) {
-            focusDetection(clicked.id, containerRef.current.clientWidth, containerRef.current.clientHeight);
-        }
-    };
-
     const handleMouseLeave = () => {
-        handleMouseUp();
         setHoveredDetectionId(null);
         if (tooltipRef.current) {
             tooltipRef.current.style.display = 'none';
@@ -202,19 +196,15 @@ export function DetectionCanvas() {
         <div
             ref={containerRef}
             className="canvas-container"
-            onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseLeave}
-            onDoubleClick={handleDoubleClick}
             onClick={handleCanvasClick}
-            onWheel={handleWheel}
         >
             <div
                 className="canvas-transform-wrapper"
                 style={{
-                    transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
-                    cursor: isDragging ? 'grabbing' : 'grab',
+                    transform: `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${zoom})`,
+                    transformOrigin: 'center center',
                 }}
             >
                 {/* Hidden image element to load source dimensions */}
@@ -233,28 +223,6 @@ export function DetectionCanvas() {
 
             {/* DOM Tooltip Element */}
             <DetectionTooltip ref={tooltipRef} />
-
-            {/* Float HUD controls */}
-            <div className="canvas-hud">
-                <button className="hud-btn" onClick={() => setZoom(zoom * 1.25)} title="Zoom In">
-                    +
-                </button>
-                <button className="hud-btn" onClick={() => setZoom(zoom / 1.25)} title="Zoom Out">
-                    -
-                </button>
-                <button
-                    className="hud-btn"
-                    onClick={() => {
-                        const img = imageRef.current;
-                        if (img) resetViewport(img.naturalWidth, img.naturalHeight);
-                        else resetViewport();
-                    }}
-                    title="Fit View"
-                >
-                    👁
-                </button>
-                <span className="hud-info">{(zoom * 100).toFixed(0)}%</span>
-            </div>
         </div>
     );
 }

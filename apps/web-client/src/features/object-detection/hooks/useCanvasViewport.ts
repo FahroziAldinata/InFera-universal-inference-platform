@@ -1,89 +1,79 @@
-import { useState, useRef } from 'react';
-import type { WheelEvent, MouseEvent } from 'react';
+import { useCallback } from 'react';
 import { useDetectionStore } from '../store/detectionStore';
 
+/** Zoom constraints */
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 10;
+
+/**
+ * Viewport hook for the detection canvas.
+ *
+ * Design:
+ *  - No pan/drag — the image is always centered in the container.
+ *  - Zoom is center-based (scales around the image center, not cursor).
+ *  - `fitToCenter()` calculates the scale + offset to fit and center
+ *    the image inside the container with a small padding margin.
+ */
 export function useCanvasViewport(containerRef: React.RefObject<HTMLDivElement | null>) {
-    const {
-        zoom,
-        panX,
-        panY,
-        setZoom,
-        setPan,
-    } = useDetectionStore();
+    const setZoom = useDetectionStore((s) => s.setZoom);
+    const setPan = useDetectionStore((s) => s.setPan);
+    const imageWidth = useDetectionStore((s) => s.imageWidth);
+    const imageHeight = useDetectionStore((s) => s.imageHeight);
+    const zoom = useDetectionStore((s) => s.zoom);
 
-    const [isDragging, setIsDragging] = useState(false);
-    const dragStart = useRef({ x: 0, y: 0 });
+    /**
+     * Computes the centered panX/panY and updates both zoom and pan in the store.
+     * Under transform-origin center center, the pan coordinates align the unscaled 
+     * image's center with the container's center and do not change with zoom level.
+     */
+    const applyCenteredZoom = useCallback((newZoom: number, customWidth?: number, customHeight?: number) => {
+        const w = customWidth ?? imageWidth;
+        const h = customHeight ?? imageHeight;
+        if (!containerRef.current || !w || !h) return;
+        const clampedZoom = Math.max(MIN_ZOOM, Math.min(newZoom, MAX_ZOOM));
+        setZoom(clampedZoom);
+        setPan(0, 0); // Centering is handled by CSS absolute positioning
+    }, [containerRef, imageWidth, imageHeight, setZoom, setPan]);
 
-    const handleMouseDown = (e: MouseEvent) => {
-        if (e.button !== 0) return; // Only left click drag to pan
-        if (!containerRef.current) return;
-        setIsDragging(true);
-        dragStart.current = { x: e.clientX - panX, y: e.clientY - panY };
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-        if (!isDragging) return;
-        const newPanX = e.clientX - dragStart.current.x;
-        const newPanY = e.clientY - dragStart.current.y;
-        setPan(newPanX, newPanY);
-    };
-
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
-
-    const handleWheel = (e: WheelEvent) => {
-        if (!containerRef.current) return;
-        e.preventDefault();
-
-        const rect = containerRef.current.getBoundingClientRect();
-        // Mouse coordinate relative to the container viewport
-        const mx = e.clientX - rect.left;
-        const my = e.clientY - rect.top;
-
-        // Map mouse point in container space to the corresponding point on the image before zoom
-        const ix = (mx - panX) / zoom;
-        const iy = (my - panY) / zoom;
-
-        const zoomFactor = 1.15;
-        let newZoom = e.deltaY < 0 ? zoom * zoomFactor : zoom / zoomFactor;
-
-        // Apply zoom boundary constraints (0.1x to 20x)
-        newZoom = Math.max(0.1, Math.min(newZoom, 20));
-
-        // Adjust pan coordinates so the image point remains under the mouse cursor after zooming
-        const newPanX = mx - ix * newZoom;
-        const newPanY = my - iy * newZoom;
-
-        setZoom(newZoom);
-        setPan(newPanX, newPanY);
-    };
-
-    const resetViewport = (imgWidth?: number, imgHeight?: number) => {
-        if (imgWidth && imgHeight && containerRef.current) {
+    /**
+     * Fits the image inside the container with a 90% padding margin
+     * and centers it. This is the initial/reset view.
+     */
+    const fitToCenter = useCallback((customWidth?: number, customHeight?: number) => {
+        const w = customWidth ?? imageWidth;
+        const h = customHeight ?? imageHeight;
+        if (w && h && containerRef.current) {
             const rect = containerRef.current.getBoundingClientRect();
-            // Calculate scale to fit image inside container
-            const scaleX = rect.width / imgWidth;
-            const scaleY = rect.height / imgHeight;
-            const fitScale = Math.max(0.1, Math.min(Math.min(scaleX, scaleY) * 0.9, 20));
-            
-            const centeredPanX = (rect.width - imgWidth * fitScale) / 2;
-            const centeredPanY = (rect.height - imgHeight * fitScale) / 2;
-            
-            setZoom(fitScale);
-            setPan(centeredPanX, centeredPanY);
+            const scaleX = rect.width / w;
+            const scaleY = rect.height / h;
+            const fitScale = Math.max(MIN_ZOOM, Math.min(Math.min(scaleX, scaleY) * 0.9, MAX_ZOOM));
+            applyCenteredZoom(fitScale, w, h);
         } else {
             setZoom(1);
             setPan(0, 0);
         }
-    };
+    }, [containerRef, imageWidth, imageHeight, setZoom, setPan, applyCenteredZoom]);
+
+    /**
+     * Zoom in by a fixed step (1.25x), keeping the image centered.
+     */
+    const zoomIn = useCallback(() => {
+        applyCenteredZoom(zoom * 1.25);
+    }, [zoom, applyCenteredZoom]);
+
+    /**
+     * Zoom out by a fixed step (1/1.25x), keeping the image centered.
+     */
+    const zoomOut = useCallback(() => {
+        applyCenteredZoom(zoom / 1.25);
+    }, [zoom, applyCenteredZoom]);
 
     return {
-        isDragging,
-        handleMouseDown,
-        handleMouseMove,
-        handleMouseUp,
-        handleWheel,
-        resetViewport,
+        fitToCenter,
+        zoomIn,
+        zoomOut,
+        applyCenteredZoom,
+        MIN_ZOOM,
+        MAX_ZOOM,
     };
 }
