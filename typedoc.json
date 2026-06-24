@@ -2,10 +2,10 @@
   "$schema": "https://typedoc.org/schema.json",
   "name": "InFera — Universal Inference Platform",
   "entryPoints": [
-    "packages/core/src/index.ts",
-    "packages/inference-engine/src/index.ts",
-    "packages/plugins/object-detection/src/index.ts",
-    "packages/plugins/image-classification/src/index.ts"
+    "packages/core",
+    "packages/inference-engine",
+    "packages/plugins/object-detection",
+    "packages/plugins/image-classification"
   ],
   "entryPointStrategy": "packages",
   "out": "apps/docs/api/generated",

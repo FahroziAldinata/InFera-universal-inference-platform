@@ -14,7 +14,7 @@ export function ResultExplanationPanel({ label, confidence }: ResultExplanationP
     else if (confidence >= 0.40) { badgeClass = 'medium'; badgeLabel = 'Medium'; }
 
     // Visual features
-    let visualFeatures: string[] = [];
+    let visualFeatures: string[];
     const cleanLabel = label.toLowerCase();
     if (cleanLabel.includes('cat') || cleanLabel.includes('gecko') || cleanLabel.includes('lizard')) {
         visualFeatures = ['Fur/skin pattern texture', 'Ear and head morphology', 'Facial structure geometry'];
