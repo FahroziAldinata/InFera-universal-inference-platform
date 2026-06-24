@@ -76,7 +76,7 @@ export function DetectionUploader() {
 
                 {/* Enable Metrics Checkbox */}
                 <div className="checkbox-field">
-                    <label className="checkbox-label">
+                    <label className="sidebar-checkbox-label">
                         <input
                             type="checkbox"
                             checked={enableMetrics}

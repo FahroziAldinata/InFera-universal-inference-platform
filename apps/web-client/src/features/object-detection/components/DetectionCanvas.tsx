@@ -4,6 +4,7 @@ import { useDetectionStore } from '../store/detectionStore';
 import { useCanvasViewport } from '../hooks/useCanvasViewport';
 import { useDetectionSelection } from '../hooks/useDetectionSelection';
 import { DetectionTooltip } from './DetectionTooltip';
+import { DetectionToolbar } from './DetectionToolbar';
 
 export function DetectionCanvas() {
     const {
@@ -187,7 +188,19 @@ export function DetectionCanvas() {
     if (!imagePreviewUrl) {
         return (
             <div className="canvas-placeholder">
-                <p className="placeholder-text">Pilih atau unggah gambar untuk memulai deteksi.</p>
+                <div className="premium-placeholder" style={{ maxWidth: '420px' }}>
+                    <div className="placeholder-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                        </svg>
+                    </div>
+                    <div className="placeholder-title">Deteksi Objek</div>
+                    <div className="placeholder-sub">
+                        Pilih file package (.zip) atau input manual lalu unggah gambar untuk memulai analisis deteksi objek.
+                    </div>
+                </div>
             </div>
         );
     }
@@ -223,6 +236,9 @@ export function DetectionCanvas() {
 
             {/* DOM Tooltip Element */}
             <DetectionTooltip ref={tooltipRef} />
+
+            {/* Floating Toolbar HUD */}
+            <DetectionToolbar />
         </div>
     );
 }

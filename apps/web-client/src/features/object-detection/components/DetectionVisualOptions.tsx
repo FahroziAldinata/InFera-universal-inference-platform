@@ -47,7 +47,7 @@ export function DetectionVisualOptions() {
                     checked={showTooltip}
                     onChange={(e) => setShowTooltip(e.target.checked)}
                 />
-                Tooltips (60 FPS)
+                Tooltips
             </label>
             <label className="sidebar-checkbox-label">
                 <input
@@ -55,7 +55,7 @@ export function DetectionVisualOptions() {
                     checked={showCrosshair}
                     onChange={(e) => setShowCrosshair(e.target.checked)}
                 />
-                HUD Crosshair
+                Crosshairs
             </label>
         </div>
     );

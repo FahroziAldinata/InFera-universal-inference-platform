@@ -177,10 +177,15 @@ export function DetectionResultTable() {
 
     if (detections.length === 0) {
         return (
-            <div className="table-placeholder">
-                <p className="placeholder-text" style={{ fontStyle: 'italic', color: 'var(--tx-3)', padding: '16px', textAlign: 'center' }}>
-                    Tidak ada objek yang terdeteksi.
-                </p>
+            <div className="table-placeholder premium-placeholder">
+                <div className="placeholder-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" />
+                        <line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
+                    </svg>
+                </div>
+                <div className="placeholder-title">No Detections Found</div>
+                <div className="placeholder-sub">Upload an image and run inference to detect objects.</div>
             </div>
         );
     }

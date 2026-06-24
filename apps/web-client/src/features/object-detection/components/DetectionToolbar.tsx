@@ -12,6 +12,8 @@ export function DetectionToolbar() {
         setPan,
         detections,
         imageFile,
+        showBoxes,
+        setShowBoxes,
     } = useDetectionStore();
 
     const isDone = step === 'done';
@@ -76,34 +78,50 @@ export function DetectionToolbar() {
     if (!imageFile) return null;
 
     return (
-        <div className="detection-toolbar-row card">
-            <div className="toolbar-group">
-                <span className="group-label">Export:</span>
-                <button className="btn-secondary toolbar-btn" disabled={!isDone} onClick={() => handleExport('png')}>
+        <div className="detection-toolbar-hud">
+            {/* Export Group */}
+            <div className="hud-group">
+                <button 
+                    className="hud-action-btn" 
+                    disabled={!isDone} 
+                    onClick={() => handleExport('png')}
+                    title="Export PNG"
+                >
                     PNG
                 </button>
-                <button className="btn-secondary toolbar-btn" disabled={!isDone} onClick={() => handleExport('jpeg')}>
+                <button 
+                    className="hud-action-btn" 
+                    disabled={!isDone} 
+                    onClick={() => handleExport('jpeg')}
+                    title="Export JPEG"
+                >
                     JPEG
                 </button>
-                <button className="btn-secondary toolbar-btn" disabled={!isDone} onClick={handleMetadataExport}>
+                <button 
+                    className="hud-action-btn" 
+                    disabled={!isDone} 
+                    onClick={handleMetadataExport}
+                    title="Export JSON Metadata"
+                >
                     JSON
                 </button>
             </div>
             
-            <div className="toolbar-divider-v" />
+            <div className="hud-separator" />
             
-            <div className="toolbar-group">
-                <span className="group-label">Zoom:</span>
-                <button className="btn-secondary toolbar-btn" onClick={handleZoomIn}>
-                    +
+            {/* Zoom & Fit Group */}
+            <div className="hud-group">
+                <span className="hud-zoom-text">{(zoom * 100).toFixed(0)}%</span>
+                <button className="hud-zoom-btn" onClick={handleZoomIn} title="Zoom In">+</button>
+                <button className="hud-zoom-btn" onClick={handleZoomOut} title="Zoom Out">-</button>
+                <button className="hud-action-btn" onClick={handleFitView} title="Fit to Viewport">Fit</button>
+                <button 
+                    className={`hud-zoom-btn eye-btn ${showBoxes ? 'active' : ''}`} 
+                    onClick={() => setShowBoxes(!showBoxes)}
+                    title="Toggle Bounding Boxes Overlay"
+                >
+                    👁️
                 </button>
-                <button className="btn-secondary toolbar-btn" onClick={handleZoomOut}>
-                    -
-                </button>
-                <button className="btn-secondary toolbar-btn" onClick={handleFitView}>
-                    Fit
-                </button>
-                <span className="zoom-text">{(zoom * 100).toFixed(0)}%</span>
             </div>
         </div>
     );

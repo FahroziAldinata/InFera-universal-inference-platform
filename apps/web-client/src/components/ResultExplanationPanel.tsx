@@ -4,71 +4,54 @@ interface ResultExplanationPanelProps {
 }
 
 export function ResultExplanationPanel({ label, confidence }: ResultExplanationPanelProps) {
-    const percentage = (confidence * 100).toFixed(1);
-    
-    // Determine Confidence Level
-    let confidenceLevel = 'Rendah';
-    let confidenceClass = 'confidence-low';
-    if (confidence >= 0.75) {
-        confidenceLevel = 'Tinggi';
-        confidenceClass = 'confidence-high';
-    } else if (confidence >= 0.40) {
-        confidenceLevel = 'Sedang';
-        confidenceClass = 'confidence-medium';
+    const percentage = (confidence * 100).toFixed(0);
+
+    // Confidence badge
+    let badgeClass = 'low';
+    let badgeLabel = 'Low';
+    if (confidence >= 0.90) { badgeClass = 'very-high'; badgeLabel = 'Very High'; }
+    else if (confidence >= 0.70) { badgeClass = 'high'; badgeLabel = 'High'; }
+    else if (confidence >= 0.40) { badgeClass = 'medium'; badgeLabel = 'Medium'; }
+
+    // Visual features
+    let visualFeatures: string[] = [];
+    const cleanLabel = label.toLowerCase();
+    if (cleanLabel.includes('cat') || cleanLabel.includes('gecko') || cleanLabel.includes('lizard')) {
+        visualFeatures = ['Fur/skin pattern texture', 'Ear and head morphology', 'Facial structure geometry'];
+    } else if (cleanLabel.includes('dog')) {
+        visualFeatures = ['Snout shape and proportions', 'Ear positioning', 'Body posture'];
+    } else if (cleanLabel.includes('car') || cleanLabel.includes('truck') || cleanLabel.includes('vehicle')) {
+        visualFeatures = ['Chassis contour lines', 'Wheel/tire geometry', 'Window reflection patterns'];
+    } else {
+        visualFeatures = ['Surface texture features', 'Object dimensional proportions', 'Visual boundary contours'];
     }
 
-    // Determine Explanation based on Class
-    let explanationText = '';
-    const cleanLabel = label.toLowerCase();
-    
-    if (cleanLabel.includes('cat')) {
-        explanationText = 'Model mendeteksi bahwa gambar ini kemungkinan besar adalah seekor kucing karena mendeteksi karakteristik visual pendukung seperti bentuk telinga yang runcing, struktur wajah bulat, dan proporsi tubuh khas felidae.';
-    } else if (cleanLabel.includes('dog')) {
-        explanationText = 'Model mengidentifikasi objek sebagai anjing karena kecocokan visual pada bentuk moncong wajah yang khas, posisi telinga, dan pola bulu/postur tubuh secara umum.';
-    } else if (cleanLabel.includes('bird')) {
-        explanationText = 'Model mendeteksi indikasi burung berdasarkan visual paruh runcing, bentuk tubuh burung, dan keberadaan sayap atau tekstur bulu.';
-    } else {
-        explanationText = 'Model mendeteksi objek yang paling mirip dengan kelas ini berdasarkan pola visual yang dipelajari selama proses training.';
-    }
+    const explanationText = `Model predicts this image as "${label}" with ${percentage}% confidence based on detected visual patterns.`;
 
     return (
-        <div className="rp-section explanation-section">
-            <div className="rp-section-header">
-                <span className="rp-section-title">Analisis Hasil</span>
+        <div className="analysis-section">
+            <div className="analysis-section-header">
+                <span className="analysis-section-title">AI Explanation</span>
+                <span className={`confidence-badge ${badgeClass}`}>{badgeLabel}</span>
             </div>
-            <div className="rp-section-body">
-                <div className="explanation-card">
-                    <div className="explanation-row">
-                        <span className="explanation-label">Prediksi:</span>
-                        <span className="explanation-value highlight">{label}</span>
-                    </div>
-                    <div className="explanation-row">
-                        <span className="explanation-label">Akurasi:</span>
-                        <span className="explanation-value highlight">{percentage}%</span>
-                    </div>
-                    <div className="explanation-row">
-                        <span className="explanation-label">Tingkat Keyakinan:</span>
-                        <span className={`explanation-value status-badge ${confidenceClass}`}>
-                            {confidenceLevel}
-                        </span>
-                    </div>
-                    
-                    <div className="explanation-detail">
-                        <span className="detail-header">Penjelasan:</span>
-                        <p className="detail-body">{explanationText}</p>
-                    </div>
 
-                    <div className="explanation-notes">
-                        <span className="notes-header">Catatan:</span>
-                        <p className="notes-body">
-                            Prediksi dapat berubah apabila:
-                            <br />• gambar blur
-                            <br />• pencahayaan buruk
-                            <br />• objek tertutup
-                            <br />• resolusi rendah
-                        </p>
-                    </div>
-                </div>
+            <div className="explanation-text-block">
+                <p style={{ color: 'var(--tx-1)', fontWeight: 500, marginBottom: '8px', fontSize: '12px', lineHeight: 1.6 }}>
+                    {explanationText}
+                </p>
+                <span style={{ display: 'block', fontSize: '10px', fontWeight: 700, color: 'var(--tx-3)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
+                    Visual cues detected:
+                </span>
+                <ul className="explanation-features">
+                    {visualFeatures.map((f, i) => <li key={i}>{f}</li>)}
+                </ul>
+            </div>
+
+            <div className="explanation-footer">
+                <span className="explanation-footer-label">Quality Note</span>
+                <span style={{ fontSize: '10px', color: 'var(--tx-3)', fontStyle: 'italic', maxWidth: '180px', textAlign: 'right' }}>
+                    Affected by image sharpness, lighting &amp; angle.
+                </span>
             </div>
         </div>
     );
